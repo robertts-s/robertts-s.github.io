@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>robertts_ // sys</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080b;
+  --surface:#0d0f14;
+  --surface2:#111420;
+  --border:#1c2030;
+  --border2:#252a3a;
+  --accent:#00ff9d;
+  --accent-dim:#00cc7a;
+  --accent-glow:rgba(0,255,157,0.15);
+  --red:#ff3355;
+  --yellow:#f0c040;
+  --text:#b8c8d8;
+  --muted:#3a4a5a;
+  --muted2:#556070;
+  --bar-h:36px;
+  --font:'Share Tech Mono',monospace;
+  --font-head:'Orbitron',sans-serif;
+}
+html,body{width:100%;height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow:hidden}
+
+/* scanlines */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
+  pointer-events:none;z-index:9000
+}
+
+/* ── BOOT ─────────────────────────────── */
+#boot{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity 0.6s ease
+}
+#boot.hide{opacity:0;pointer-events:none}
+.boot-logo{
+  font-family:var(--font-head);font-size:clamp(1.6rem,5vw,3rem);font-weight:900;
+  color:var(--accent);letter-spacing:4px;
+  text-shadow:0 0 40px rgba(0,255,157,0.5)
+}
+.boot-logo span{color:var(--muted2)}
+.boot-sub{font-size:0.65rem;letter-spacing:4px;color:var(--muted2);text-transform:uppercase}
+.boot-bar-wrap{width:min(320px,80vw);height:2px;background:var(--border2);overflow:hidden}
+.boot-bar{height:100%;width:0%;background:var(--accent);animation:bootload 2s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes bootload{to{width:100%}}
+.boot-log{
+  width:min(420px,80vw);
+  font-size:0.62rem;color:var(--muted2);
+  display:flex;flex-direction:column;gap:4px
+}
+.boot-log-line{display:flex;gap:8px}
+.boot-log-line .ok{color:var(--accent)}
+.boot-log-line .info{color:var(--muted2)}
+.boot-cursor{display:inline-block;width:6px;height:12px;background:var(--accent);animation:blink 1s step-end infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+
+/* ── DESKTOP ────────────────────────── */
+#desktop{
+  width:100%;height:100%;position:relative;
+  background:
+    radial-gradient(ellipse at 15% 80%,rgba(0,255,157,0.04) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 10%,rgba(0,255,157,0.03) 0%,transparent 45%),
+    var(--bg)
+}
+#desktop::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,157,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,157,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none
+}
+
+/* ── DESKTOP ICONS ──────────────────── */
+.d-icons{
+  position:absolute;top:16px;left:16px;
+  display:grid;grid-template-columns:repeat(2,72px);gap:10px;
+  z-index:10
+}
+.d-icon{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:10px 6px 8px;cursor:pointer;
+  border:1px solid transparent;
+  transition:all 0.15s;width:72px
+}
+.d-icon:hover{
+  background:rgba(0,255,157,0.06);
+  border-color:rgba(0,255,157,0.3);
+}
+.d-icon:active{ transform:scale(0.95); }
+/* icon box */
+.d-icon .ic-box{
+  width:40px;height:40px;
+  border:1px solid var(--border2);
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;flex-shrink:0;
+  position:relative;overflow:hidden
+}
+.d-icon .ic-box::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,157,0.07) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.15s
+}
+.d-icon:hover .ic-box{
+  border-color:rgba(0,255,157,0.5);
+  box-shadow:0 0 12px rgba(0,255,157,0.12)
+}
+.d-icon:hover .ic-box::before{ opacity:1 }
+.d-icon .ic-box svg{ width:20px;height:20px;stroke:var(--muted2);transition:stroke 0.15s }
+.d-icon:hover .ic-box svg{ stroke:var(--accent) }
+.d-icon .lbl{
+  font-size:0.55rem;color:var(--muted2);letter-spacing:0.5px;
+  text-align:center;line-height:1.3;word-break:break-all
+}
+.d-icon:hover .lbl{color:var(--accent)}
+
+/* ── TASKBAR ────────────────────────── */
+#taskbar{
+  position:fixed;bottom:0;left:0;right:0;height:var(--bar-h);
+  background:rgba(7,8,11,0.92);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border2);
+  display:flex;align-items:center;padding:0 10px;gap:8px;z-index:5000
+}
+.tb-brand{
+  font-family:var(--font-head);font-size:0.65rem;font-weight:700;
+  color:var(--accent);letter-spacing:2px;padding:4px 10px;
+  border:1px solid rgba(0,255,157,0.3);cursor:pointer;
+  transition:all 0.12s;white-space:nowrap
+}
+.tb-brand:hover{background:rgba(0,255,157,0.08);border-color:var(--accent)}
+.tb-sep{width:1px;height:18px;background:var(--border2)}
+.tb-wins{display:flex;gap:4px;flex:1;overflow:hidden}
+.tb-win{
+  font-size:0.6rem;color:var(--muted2);padding:3px 10px;
+  border:1px solid transparent;cursor:pointer;transition:all 0.12s;
+  white-space:nowrap;letter-spacing:0.5px
+}
+.tb-win:hover,.tb-win.active{color:var(--accent);border-color:var(--border2);background:var(--surface2)}
+.tb-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tb-status{font-size:0.58rem;color:var(--accent);letter-spacing:1px;animation:blink 2s step-end infinite}
+.tb-clock{font-size:0.62rem;color:var(--muted2);min-width:40px;text-align:right}
+
+/* ── START MENU ─────────────────────── */
+#startmenu{
+  position:fixed;bottom:var(--bar-h);left:0;
+  width:200px;
+  background:rgba(10,12,18,0.97);backdrop-filter:blur(16px);
+  border:1px solid var(--border2);border-bottom:none;
+  padding:6px;z-index:6000;
+  display:none;flex-direction:column;gap:1px;
+  animation:menuUp 0.12s ease
+}
+@keyframes menuUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#startmenu.open{display:flex}
+.smenu-hdr{
+  font-size:0.55rem;color:var(--muted2);letter-spacing:3px;
+  padding:6px 8px 3px;text-transform:uppercase
+}
+.smenu-sep{height:1px;background:var(--border);margin:4px 0}
+.smenu-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;font-size:0.65rem;color:var(--text);
+  cursor:pointer;transition:background 0.1s;letter-spacing:0.5px
+}
+.smenu-item:hover{background:rgba(0,255,157,0.07);color:var(--accent)}
+.smenu-item .si{font-size:0.7rem;color:var(--muted2);width:14px;text-align:center}
+.smenu-item:hover .si{color:var(--accent)}
+
+/* ── WINDOWS ────────────────────────── */
+.window{
+  position:absolute;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  box-shadow:0 0 0 1px rgba(0,255,157,0.04),0 20px 60px rgba(0,0,0,0.7);
+  display:none;flex-direction:column;
+  overflow:hidden;z-index:100;
+  min-width:280px;min-height:160px
+}
+.window.open{display:flex;animation:winOpen 0.15s ease}
+.window.focused{border-color:rgba(0,255,157,0.35);box-shadow:0 0 0 1px rgba(0,255,157,0.08),0 0 30px rgba(0,255,157,0.06),0 20px 60px rgba(0,0,0,0.7)}
+@keyframes winOpen{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:none}}
+
+.titlebar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border2);
+  cursor:move;flex-shrink:0;user-select:none
+}
+.win-dots{display:flex;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%;cursor:pointer;transition:opacity 0.1s}
+.dot:hover{opacity:0.7}
+.dot.close{background:var(--red)}
+.dot.min{background:var(--yellow)}
+.dot.max{background:var(--accent)}
+.win-title{
+  font-family:var(--font-head);font-size:0.58rem;
+  color:var(--muted2);letter-spacing:2px;flex:1;text-align:center
+}
+.focused .win-title{color:var(--accent)}
+.win-body{flex:1;overflow-y:auto;overflow-x:hidden}
+.win-body::-webkit-scrollbar{width:3px}
+.win-body::-webkit-scrollbar-thumb{background:var(--border2)}
+.win-body::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+/* Resize handles — 8 edges */
+.resize-handle{position:absolute;z-index:10}
+.rh-n {top:0;left:8px;right:8px;height:4px;cursor:n-resize}
+.rh-s {bottom:0;left:8px;right:8px;height:4px;cursor:s-resize}
+.rh-w {left:0;top:8px;bottom:8px;width:4px;cursor:w-resize}
+.rh-e {right:0;top:8px;bottom:8px;width:4px;cursor:e-resize}
+.rh-nw{top:0;left:0;width:10px;height:10px;cursor:nw-resize}
+.rh-ne{top:0;right:0;width:10px;height:10px;cursor:ne-resize}
+.rh-sw{bottom:0;left:0;width:10px;height:10px;cursor:sw-resize}
+.rh-se{bottom:0;right:0;width:10px;height:10px;cursor:se-resize}
+/* keep old .resize-h hidden — replaced */
+.resize-h{display:none}
+
+/* ── ABOUT WINDOW ───────────────────── */
+#win-about{width:460px;top:70px;left:120px}
+.about-body{padding:24px;display:flex;flex-direction:column;gap:18px}
+.about-top{display:flex;align-items:center;gap:16px}
+.avatar{
+  width:56px;height:56px;border:1px solid rgba(0,255,157,0.3);
+  background:linear-gradient(135deg,rgba(0,255,157,0.1),rgba(0,255,157,0.03));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--font-head);font-size:1.2rem;font-weight:900;color:var(--accent)
+}
+.about-id{display:flex;flex-direction:column;gap:4px}
+.about-handle{
+  font-family:var(--font-head);font-size:1.1rem;font-weight:900;
+  color:#fff;letter-spacing:1px
+}
+.about-role{font-size:0.62rem;color:var(--accent);letter-spacing:2px}
+.about-bio{
+  font-size:0.68rem;color:var(--muted2);line-height:1.9;
+  border-left:2px solid rgba(0,255,157,0.3);padding-left:12px
+}
+.about-bio b{color:var(--text)}
+.about-links{display:flex;gap:8px;flex-wrap:wrap}
+.a-link{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  border:1px solid var(--border2);background:var(--surface2);
+  color:var(--muted2);font-size:0.62rem;letter-spacing:1px;
+  cursor:pointer;text-decoration:none;transition:all 0.12s
+}
+.a-link:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,255,157,0.06)}
+.a-link .ic{font-size:0.75rem}
+.skills-row{display:flex;gap:6px;flex-wrap:wrap}
+.skill-tag{
+  font-size:0.58rem;padding:3px 8px;letter-spacing:1px;
+  background:rgba(0,255,157,0.06);color:var(--accent);
+  border:1px solid rgba(0,255,157,0.2)
+}
+
+/* ── PROJECTS WINDOW ────────────────── */
+#win-projects{width:500px;top:60px;left:200px}
+.projects-body{padding:16px;display:flex;flex-direction:column;gap:10px}
+.proj-card{
+  border:1px solid var(--border2);background:var(--surface2);
+  padding:14px 16px;cursor:pointer;text-decoration:none;display:block;
+  transition:all 0.12s;position:relative
+}
+.proj-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--accent);opacity:0;transition:opacity 0.12s
+}
+.proj-card:hover{border-color:rgba(0,255,157,0.3);background:rgba(0,255,157,0.03)}
+.proj-card:hover::before{opacity:1}
+.proj-name{
+  font-family:var(--font-head);font-size:0.75rem;font-weight:700;
+  color:var(--text);margin-bottom:5px;letter-spacing:1px
+}
+.proj-card:hover .proj-name{color:var(--accent)}
+.proj-desc{font-size:0.65rem;color:var(--muted2);line-height:1.7;margin-bottom:8px}
+.proj-tags{display:flex;gap:6px;flex-wrap:wrap}
+.p-tag{
+  font-size:0.55rem;padding:2px 7px;letter-spacing:1px;
+  background:rgba(0,255,157,0.05);color:var(--muted2);
+  border:1px solid var(--border2)
+}
+.proj-placeholder{
+  border:1px dashed var(--border2);padding:20px;
+  text-align:center;font-size:0.62rem;color:var(--muted);line-height:2
+}
+
+/* ── SOCIAL WINDOW ──────────────────── */
+#win-social{width:320px;top:90px;left:620px}
+.social-body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.social-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:1px solid var(--border2);background:var(--surface2);
+  text-decoration:none;color:var(--text);transition:all 0.12s;cursor:pointer
+}
+.social-row:hover{border-color:rgba(0,255,157,0.3);transform:translateX(3px)}
+.social-row:hover .s-name{color:var(--accent)}
+.s-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.s-info{flex:1}
+.s-name{font-size:0.7rem;color:var(--text);letter-spacing:1px;transition:color 0.12s}
+.s-handle{font-size:0.58rem;color:var(--muted2);margin-top:2px}
+.s-arrow{font-size:0.65rem;color:var(--muted)}
+
+/* ── TERMINAL WINDOW ────────────────── */
+#win-terminal{width:480px;top:140px;left:150px}
+.term-body{
+  padding:14px;font-size:0.68rem;
+  background:#050608;color:var(--accent);
+  line-height:1.9;min-height:200px
+}
+.t-line{display:flex;gap:6px;flex-wrap:wrap}
+.t-prompt{color:var(--muted2)}
+.t-prompt .host{color:var(--accent)}
+.t-cmd{color:var(--text)}
+.t-out{color:var(--muted2);padding-left:14px}
+.t-out .val{color:var(--accent)}
+.t-cur{display:inline-block;width:7px;height:13px;background:var(--accent);animation:blink 1s step-end infinite;vertical-align:middle}
+
+/* ── FLIPPER WINDOW ─────────────────── */
+#win-flipper{width:900px;top:50px;left:80px}
+#win-pet{width:480px;top:70px;left:160px}
+.flipper-iframe{
+  width:100%;height:560px;border:none;
+  background:var(--bg);display:block
+}
+
+/* ── SCROLLBARS ─────────────────────── */
+*{scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+
+/* ── RESPONSIVE MOBILE ──────────────── */
+@media(max-width:600px){
+  :root{ --bar-h:44px }
+
+  /* Desktop icons: top-left */
+  .d-icons{
+    top:10px;bottom:auto;
+    left:10px;right:auto;
+    grid-template-columns:repeat(3,60px);
+    gap:8px
+  }
+  .d-icon{ width:60px }
+  .d-icon .ic-box{ width:36px;height:36px }
+  .d-icon .ic-box svg{ width:17px;height:17px }
+  .d-icon .lbl{ font-size:0.5rem }
+
+  /* Windows fill the screen */
+  .window:not(#win-about){
+    position:fixed!important;
+    top:0!important;left:0!important;
+    width:100vw!important;height:calc(100vh - var(--bar-h))!important;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    min-width:unset;min-height:unset
+  }
+  /* whoami: compact centered card on mobile */
+  #win-about{
+    position:fixed!important;
+    top:50%!important;left:50%!important;
+    transform:translate(-50%,-54px);
+    width:calc(100vw - 24px)!important;
+    max-width:360px!important;
+    height:auto!important;
+    max-height:calc(100vh - var(--bar-h) - 40px)!important;
+    overflow-y:auto;
+    min-width:unset;min-height:unset
+  }
+  .titlebar{ cursor:default;padding:10px 12px }
+  .resize-h{ display:none }
+
+  /* Taskbar: hide win list, show only brand + clock */
+  .tb-wins{ display:none }
+  .tb-sep{ display:none }
+  .tb-brand{ font-size:0.6rem;padding:6px 10px }
+  .tb-status{ display:none }
+  .tb-clock{ font-size:0.62rem }
+  #taskbar{ padding:0 12px }
+
+  /* Start menu full width */
+  #startmenu{ width:100%;left:0;border-radius:0 }
+  .smenu-item{ padding:10px 14px;font-size:0.72rem }
+
+  /* About window inner padding */
+  .about-body{ padding:16px;gap:14px }
+  .about-handle{ font-size:0.9rem }
+
+  /* Projects body */
+  .projects-body{ padding:12px }
+
+  /* Flipper iframe taller on mobile */
+  .flipper-iframe{ height:calc(100vh - var(--bar-h) - 38px) }
+
+  /* Boot log smaller */
+  .boot-log{ font-size:0.58rem }
+  .boot-logo{ letter-spacing:2px }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT -->
+<div id="boot">
+  <div class="boot-logo">robertts_<span>OS</span></div>
+  <div class="boot-sub">personal terminal // v1.0.0</div>
+  <div class="boot-bar-wrap"><div class="boot-bar"></div></div>
+  <div class="boot-log" id="bootLog"></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="d-icons">
+    <!-- whoami -->
+    <div class="d-icon" onclick="openWin('win-about')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <span class="lbl">whoami.sh</span>
+    </div>
+    <!-- projects -->
+    <div class="d-icon" onclick="openWin('win-projects')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7h4l2-3h6l2 3h4v13H3z"/><path d="M3 7h18"/>
+        </svg>
+      </div>
+      <span class="lbl">projects/</span>
+    </div>
+    <!-- social -->
+    <div class="d-icon" onclick="openWin('win-social')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/>
+          <path d="M8.5 10.5l7-4M8.5 13.5l7 4"/>
+        </svg>
+      </div>
+      <span class="lbl">links.txt</span>
+    </div>
+    <!-- flipper -->
+    <div class="d-icon" onclick="openWin('win-flipper')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="3" width="14" height="18" rx="2"/>
+          <rect x="8" y="6" width="8" height="5" rx="1"/>
+          <circle cx="9" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="15" cy="15" r="1"/>
+          <circle cx="9" cy="18" r="1"/><circle cx="12" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>
+        </svg>
+      </div>
+      <span class="lbl">flipper_ir.app</span>
+    </div>
+    <!-- terminal -->
+    <div class="d-icon" onclick="openWin('win-terminal')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M7 9l3 3-3 3M13 15h4"/>
+        </svg>
+      </div>
+      <span class="lbl">terminal</span>
+    </div>
+    <!-- pet -->
+    <div class="d-icon" onclick="openWin('win-pet')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="13" r="4"/>
+          <circle cx="5" cy="7" r="2"/><circle cx="19" cy="7" r="2"/>
+          <circle cx="8" cy="5" r="1.5"/><circle cx="16" cy="5" r="1.5"/>
+          <path d="M9 13c0-1.7 1.3-3 3-3s3 1.3 3 3"/>
+        </svg>
+      </div>
+      <span class="lbl">MyGirlfriend'sPet</span>
+    </div>
+    <!-- snake -->
+    <div class="d-icon" onclick="openWin('win-snake')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="9" width="4" height="4" rx="0.5"/>
+          <rect x="7" y="9" width="4" height="4" rx="0.5"/>
+          <rect x="7" y="13" width="4" height="4" rx="0.5"/>
+          <rect x="11" y="13" width="4" height="4" rx="0.5"/>
+          <rect x="11" y="9" width="4" height="4" rx="0.5"/>
+          <circle cx="18" cy="7" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <span class="lbl">snake.exe</span>
+    </div>
+  </div>
+</div>
+
+<!-- START MENU -->
+<div id="startmenu">
+  <div class="smenu-hdr">apps</div>
+  <div class="smenu-item" onclick="openWin('win-about');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>whoami.sh
+  </div>
+  <div class="smenu-item" onclick="openWin('win-projects');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><path d="M3 7h18"/></svg>projects/
+  </div>
+  <div class="smenu-item" onclick="openWin('win-social');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.5 10.5l7-4M8.5 13.5l7 4"/></svg>links.txt
+  </div>
+  <div class="smenu-item" onclick="openWin('win-flipper');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="5" rx="1"/><circle cx="9" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>flipper_ir.app
+  </div>
+  <div class="smenu-item" onclick="openWin('win-terminal');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>terminal
+  </div>
+  <div class="smenu-item" onclick="openWin('win-pet');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><circle cx="12" cy="13" r="4"/><circle cx="5" cy="7" r="2"/><circle cx="19" cy="7" r="2"/><path d="M9 13c0-1.7 1.3-3 3-3s3 1.3 3 3"/></svg>pet.app
+  </div>
+  <div class="smenu-item" onclick="openWin('win-snake');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="3" y="9" width="4" height="4" rx="0.5"/><rect x="7" y="9" width="4" height="4" rx="0.5"/><rect x="7" y="13" width="4" height="4" rx="0.5"/><rect x="11" y="13" width="4" height="4" rx="0.5"/><circle cx="18" cy="7" r="2" fill="currentColor" stroke="none"/></svg>snake.exe
+  </div>
+  <div class="smenu-sep"></div>
+  <div class="smenu-hdr">links</div>
+  <div class="smenu-item" onclick="window.open('https://instagram.com/robertts.s','_blank');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>Instagram
+  </div>
+  <div class="smenu-item" onclick="window.open('https://tiktok.com/@robertts.s','_blank');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>TikTok
+  </div>
+  <div class="smenu-item" onclick="window.open('https://github.com/robertts-s','_blank');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1-.3-3.3 1.3a11.5 11.5 0 0 0-6 0C6.3 2.8 5.3 3.1 5.3 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 3.9 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>GitHub
+  </div>
+</div>
+
+<!-- TASKBAR -->
+<div id="taskbar">
+  <div class="tb-brand" onclick="toggleMenu()">robertts_ ⊞</div>
+  <div class="tb-sep"></div>
+  <div class="tb-wins" id="tbWins"></div>
+  <div class="tb-right">
+    <span class="tb-status">● ONLINE</span>
+    <span class="tb-clock" id="clock"></span>
+  </div>
+</div>
+
+<!-- ABOUT WINDOW -->
+<div class="window" id="win-about">
+  <div class="titlebar" onmousedown="startDrag(event,'win-about')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-about')"></div>
+      <div class="dot min" onclick="maximizeWin('win-about')"></div>
+      <div class="dot max" onclick="minimizeWin('win-about')"></div>
+    </div>
+    <div class="win-title">whoami.sh</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body">
+    <div class="about-body">
+      <div class="about-top">
+        <div class="avatar">R</div>
+        <div class="about-id">
+          <div class="about-handle">robertts_</div>
+          <div class="about-role">// security &amp; development</div>
+        </div>
+      </div>
+      <div class="about-bio">
+        Hola, soy <b>robertts_</b>. Bienvenido a mi proyecto.<br>
+      </div>
+      <div class="skills-row">
+        <span class="skill-tag">cybersec</span>
+        <span class="skill-tag">flipper zero</span>
+        <span class="skill-tag">infrared</span>
+        <span class="skill-tag">javascript</span>
+        <span class="skill-tag">linux</span>
+      </div>
+      <div class="about-links">
+        <a class="a-link" href="https://instagram.com/robertts.s" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          instagram
+        </a>
+        <a class="a-link" href="https://tiktok.com/@robertts.s" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="flex-shrink:0"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+          tiktok
+        </a>
+        <a class="a-link" href="https://github.com/robertts-s" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1-.3-3.3 1.3a11.5 11.5 0 0 0-6 0C6.3 2.8 5.3 3.1 5.3 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 3.9 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+          github
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-about','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-about','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-about','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-about','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-about','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-about','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-about','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-about','se')"></div>
+</div>
+
+<!-- PROJECTS WINDOW -->
+<div class="window" id="win-projects">
+  <div class="titlebar" onmousedown="startDrag(event,'win-projects')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-projects')"></div>
+      <div class="dot min" onclick="maximizeWin('win-projects')"></div>
+      <div class="dot max" onclick="minimizeWin('win-projects')"></div>
+    </div>
+    <div class="win-title">projects/</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body">
+    <div class="projects-body">
+      <!-- ✏️ PROYECTO 1: Flipper IR Macro Builder -->
+      <a class="proj-card" href="#" onclick="openWin('win-flipper');return false;">
+        <div class="proj-name">FLIPPER IR MACRO BUILDER</div>
+        <div class="proj-desc">
+          Herramienta web para construir secuencias de señales infrarrojas para Flipper Zero.
+          Exporta archivos .ir y código C nativo listo para compilar.
+        </div>
+        <div class="proj-tags">
+          <span class="p-tag">flipper zero</span>
+          <span class="p-tag">infrared</span>
+          <span class="p-tag">javascript</span>
+          <span class="p-tag">hardware</span>
+        </div>
+      </a>
+      <!-- ✏️ PROYECTO 2: añade el tuyo -->
+      <a class="proj-card" href="https://github.com/robertts-s" target="_blank">
+        <div class="proj-name">PROYECTO 02</div>
+        <div class="proj-desc">Descripción de tu segundo proyecto. Qué hace, para qué sirve.</div>
+        <div class="proj-tags">
+          <span class="p-tag">python</span>
+          <span class="p-tag">linux</span>
+        </div>
+      </a>
+      <!-- placeholder -->
+      <div class="proj-placeholder">
+        + Añade más proyectos editando el HTML<br>
+        <span style="color:var(--accent);font-size:0.58rem">// copia un bloque .proj-card</span>
+      </div>
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-projects','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-projects','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-projects','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-projects','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-projects','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-projects','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-projects','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-projects','se')"></div>
+</div>
+
+<!-- SOCIAL WINDOW -->
+<div class="window" id="win-social">
+  <div class="titlebar" onmousedown="startDrag(event,'win-social')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-social')"></div>
+      <div class="dot min" onclick="maximizeWin('win-social')"></div>
+      <div class="dot max" onclick="minimizeWin('win-social')"></div>
+    </div>
+    <div class="win-title">links.txt</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body">
+    <div class="social-body">
+      <a class="social-row" href="https://instagram.com/robertts.s" target="_blank">
+        <span class="s-icon">📸</span>
+        <div class="s-info">
+          <div class="s-name">INSTAGRAM</div>
+          <div class="s-handle">@robertts.s</div>
+        </div>
+        <span class="s-arrow">↗</span>
+      </a>
+      <a class="social-row" href="https://github.com/robertts-s" target="_blank">
+        <!-- ✏️ pon tu URL real de GitHub -->
+        <span class="s-icon">🐙</span>
+        <div class="s-info">
+          <div class="s-name">GITHUB</div>
+          <div class="s-handle">@robertts-s</div>
+        </div>
+        <span class="s-arrow">↗</span>
+      </a>
+      <!-- ✏️ añade más redes copiando un .social-row -->
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-social','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-social','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-social','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-social','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-social','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-social','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-social','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-social','se')"></div>
+</div>
+
+<!-- TERMINAL WINDOW -->
+<div class="window" id="win-terminal">
+  <div class="titlebar" onmousedown="startDrag(event,'win-terminal')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-terminal')"></div>
+      <div class="dot min" onclick="maximizeWin('win-terminal')"></div>
+      <div class="dot max" onclick="minimizeWin('win-terminal')"></div>
+    </div>
+    <div class="win-title">terminal</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body">
+    <div class="term-body">
+      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">whoami</span></div>
+      <div class="t-out">robertts_ <span class="val">// developer &amp; security enthusiast</span></div>
+      <br>
+      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">cat links.txt</span></div>
+      <div class="t-out">instagram  <span class="val">→ @robertts.s</span></div>
+      <div class="t-out">tiktok     <span class="val">→ @robertts.s</span></div>
+      <div class="t-out">github     <span class="val">→ github.com/robertts-s</span></div>
+      <br>
+      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">ls projects/</span></div>
+      <div class="t-out"><span class="val">flipper_ir_macro_builder/</span>  proyecto_02/</div>
+      <br>
+      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cur"></span></div>
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-terminal','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-terminal','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-terminal','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-terminal','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-terminal','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-terminal','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-terminal','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-terminal','se')"></div>
+</div>
+
+<!-- FLIPPER IR MACRO BUILDER WINDOW -->
+<div class="window" id="win-flipper">
+  <div class="titlebar" onmousedown="startDrag(event,'win-flipper')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-flipper')"></div>
+      <div class="dot min" onclick="maximizeWin('win-flipper')"></div>
+      <div class="dot max" onclick="minimizeWin('win-flipper')"></div>
+    </div>
+    <div class="win-title">flipper_ir_macro_builder.app</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body" style="overflow:hidden">
+    <iframe class="flipper-iframe" id="flipperFrame" srcdoc="" title="Flipper IR Macro Builder"></iframe>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-flipper','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-flipper','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-flipper','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-flipper','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-flipper','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-flipper','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-flipper','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-flipper','se')"></div>
+</div>
+
+<!-- PET WINDOW -->
+<div class="window" id="win-pet">
+  <div class="titlebar" onmousedown="startDrag(event,'win-pet')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-pet')"></div>
+      <div class="dot min" onclick="maximizeWin('win-pet')"></div>
+      <div class="dot max" onclick="minimizeWin('win-pet')"></div>
+    </div>
+    <div class="win-title">MyGirlfriend'sPet</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body" style="overflow:hidden">
+    <iframe id="petFrame" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no&quot;/&gt;
+&lt;title&gt;bunnY_sys // tamagotchi v2.9&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;family=Orbitron:wght=400;700;900&amp;display=swap&quot; rel=&quot;stylesheet&quot;/&gt;
+&lt;style&gt;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #07080b;
+  --surface: #0d0f14;
+  --surface2: #111420;
+  --border: #1c2030;
+  --border2: #252a3a;
+  --accent: #00ff9d;
+  --accent-dim: #00cc7a;
+  --accent-glow: rgba(0, 255, 157, 0.15);
+  --red: #ff3355;
+  --yellow: #f0c040;
+  --text: #b8c8d8;
+  --muted: #3a4a5a;
+  --muted2: #556070;
+  --font: 'Share Tech Mono', monospace;
+  --font-head: 'Orbitron', sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, 0.06) 3px, rgba(0, 0, 0, 0.06) 4px);
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.tama-container {
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 30px rgba(0, 255, 157, 0.06), 0 20px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.tama-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+  user-select: none;
+}
+
+.tama-title {
+  font-family: var(--font-head);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.score-panel {
+  font-size: 0.65rem;
+  color: var(--muted2);
+}
+.score-panel span { color: var(--text); }
+
+.tama-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: blink 2s step-end infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.tama-screen {
+  padding: 16px;
+  background: #050608;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+}
+
+.stat-label {
+  color: var(--muted2);
+}
+
+.stat-bar-container {
+  width: 180px;
+  height: 6px;
+  background: var(--border);
+  border: 1px solid var(--border2);
+  position: relative;
+}
+
+.stat-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.stat-bar.low {
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+}
+
+.stat-bar.warning {
+  background: var(--yellow);
+}
+
+/* VIEWPORT OPTIMIZADO */
+.viewport {
+  height: 140px;
+  border: 1px dashed var(--border2);
+  background: rgba(0, 255, 157, 0.01);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.viewport:hover {
+  background: rgba(0, 255, 157, 0.03);
+}
+
+.ascii-bunny {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  font-family: monospace;
+  white-space: pre;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+/* Animación estática por defecto */
+.bunny-idle {
+  animation: idle-breathing 2.5s ease-in-out infinite;
+}
+
+@keyframes idle-breathing {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(0.93) scaleX(1.04) translateY(1px); }
+}
+
+/* Animaciones reactivas forzadas */
+.bunny-bounce {
+  animation: jump-bounce 0.5s cubic-bezier(0.25, 1, 0.5, 1) 1 !important;
+}
+@keyframes jump-bounce {
+  0%, 100% { transform: scale(1) translateY(0); }
+  40% { transform: scale(0.85, 1.2) translateY(-22px); }
+  75% { transform: scale(1.15, 0.85) translateY(0); }
+}
+
+.bunny-shake {
+  animation: fast-shake 0.25s ease-in-out infinite !important;
+}
+@keyframes fast-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* --- OBJETOS FLOTANTES (EMOJIS) --- */
+.anim-object {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Zanahoria cayendo en su boca */
+.carrot-fall {
+  animation: carrot-anim 0.8s ease-in forwards;
+}
+@keyframes carrot-anim {
+  0% { top: -40px; opacity: 0; transform: translateX(-50%) scale(0.6); }
+  30% { opacity: 1; }
+  70% { top: 40px; transform: translateX(-50%) rotate(25deg) scale(1.1); opacity: 1; }
+  100% { top: 65px; transform: translateX(-50%) scale(0); opacity: 0; }
+}
+
+/* Pelota rebotando */
+.ball-bounce {
+  animation: ball-anim 1s ease-in-out forwards;
+}
+@keyframes ball-anim {
+  0% { left: 10%; top: 20px; transform: rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  50% { left: 50%; top: 65px; transform: rotate(180deg); }
+  75% { left: 75%; top: 25px; transform: rotate(270deg); opacity: 1; }
+  100% { left: 95%; top: 75px; transform: rotate(360deg); opacity: 0; }
+}
+
+/* Mano haciendo mimos */
+.hand-pet {
+  animation: hand-anim 1s ease-in-out forwards;
+}
+@keyframes hand-anim {
+  0% { top: -40px; opacity: 0; }
+  30%, 70% { top: 10px; transform: translateX(-50%) rotate(-15deg); opacity: 1; }
+  50% { top: 8px; transform: translateX(-50%) rotate(15deg); opacity: 1; }
+  100% { top: -40px; opacity: 0; }
+}
+
+/* Corazones flotantes */
+.particle {
+  position: absolute;
+  font-size: 1.2rem;
+  pointer-events: none;
+  animation: float-up 0.8s ease-out forwards;
+  z-index: 6;
+}
+@keyframes float-up {
+  0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(10px) scale(1.5); opacity: 0; }
+}
+
+.console-log {
+  font-size: 0.62rem;
+  color: var(--muted2);
+  height: 32px;
+  line-height: 32px;
+  padding: 0 8px;
+  background: #030406;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console-log span { color: var(--accent); }
+.console-log span.warn { color: var(--yellow); }
+.console-log span.danger { color: var(--red); }
+
+.controls-panel {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: var(--surface);
+}
+
+.btn-action {
+  font-family: var(--font);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.btn-action:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0, 255, 157, 0.05);
+}
+
+.btn-action:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 8, 11, 0.96);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 10;
+}
+
+.overlay.active {
+  display: flex !important;
+}
+
+.overlay-title {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  color: var(--red);
+  letter-spacing: 2px;
+  animation: glitch-text 1s linear infinite;
+}
+
+@keyframes glitch-text {
+  0%, 100% { text-shadow: 2px 0 0 rgba(255,0,0,0.5), -2px 0 0 rgba(0,255,255,0.5); }
+  50% { text-shadow: -2px 0 0 rgba(255,0,0,0.5), 2px 0 0 rgba(0,255,255,0.5); }
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;tama-container&quot;&gt;
+  &lt;div class=&quot;tama-header&quot;&gt;
+    &lt;div class=&quot;tama-title&quot;&gt;BUNNY_CORE_v2.9&lt;/div&gt;
+    &lt;div class=&quot;score-panel&quot;&gt;CICLOS: &lt;span id=&quot;cycle-count&quot;&gt;0&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;tama-status-dot&quot; id=&quot;statusDot&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;tama-screen&quot;&gt;
+    &lt;div class=&quot;stats-panel&quot;&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;ALIMENTACIÓN //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-hunger&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;ENTRETENIMIENTO //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-boredom&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;AFECTO //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-affection&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;viewport&quot; id=&quot;viewport&quot; onclick=&quot;actionPet()&quot;&gt;
+      &lt;div class=&quot;ascii-bunny bunny-idle&quot; id=&quot;bunny-render&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;console-log&quot; id=&quot;consoleLog&quot;&gt;sys:// conejito.sh inicializado.&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;controls-panel&quot;&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionFeed()&quot;&gt;Alimentar&lt;/button&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionPlay()&quot;&gt;Jugar&lt;/button&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionPet()&quot;&gt;Acariciar&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;overlay&quot; id=&quot;death-overlay&quot;&gt;
+    &lt;div class=&quot;overlay-title&quot;&gt;SYSTEM FAILURE&lt;/div&gt;
+    &lt;div style=&quot;font-size:0.65rem; color:var(--muted2); text-align:center; line-height:1.6;&quot;&gt;
+      El espécimen digital ha expirado.&lt;br&gt;Ciclos totales sobrevividos: &lt;span id=&quot;final-cycles&quot; style=&quot;color:var(--text)&quot;&gt;0&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;resetTamagotchi()&quot; style=&quot;width:120px; margin-top:8px;&quot;&gt;Reiniciar&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+let stats = { hunger: 100, boredom: 100, affection: 100 };
+let isDead = false;
+let isAnimating = false; // Bloquea sobreescrituras de bucle durante acciones
+let actionTimeout = null;
+let cycles = 0;
+let cycleInterval = null;
+let degradationInterval = null;
+
+const BUNNY_STATES = {
+  NORMAL: &quot;(\\_/)\n( •_•)\n/[   ]\\&quot;,
+  SAD:    &quot;(\\_/)\n( ☹_☹)\n/[   ]\\&quot;,
+  EATING: &quot;(\\_/)\n( ʘ_ʘ) *nom\n/[   ]\\&quot;,
+  HAPPY:  &quot;(\\_/)\n( &gt;.&lt;) *~\n/[ ♥ ]\\&quot;,
+  DEAD:   &quot;(x_x)\n/| |\\&quot;
+};
+
+const RANDOM_EVENTS = [
+  { msg: &quot;Alerta: Micro-glitch en sector 7. El conejo se asustó.&quot;, hunger: 0, boredom: -10, affection: -5, type: 'warn' },
+  { msg: &quot;Spam detectado: Procesos basura ralentizan al conejito.&quot;, hunger: -5, boredom: -15, affection: 0, type: 'warn' },
+  { msg: &quot;Fuga de memoria: Se han perdido nutrientes digitales.&quot;, hunger: -15, boredom: 0, affection: 0, type: 'danger' },
+  { msg: &quot;Optimización de CPU: El espécimen se siente con energía.&quot;, hunger: 0, boredom: 10, affection: 5, type: 'sys' }
+];
+
+const barHunger = document.getElementById('bar-hunger');
+const barBoredom = document.getElementById('bar-boredom');
+const barAffection = document.getElementById('bar-affection');
+const bunnyRender = document.getElementById('bunny-render');
+const consoleLog = document.getElementById('consoleLog');
+const deathOverlay = document.getElementById('death-overlay');
+const statusDot = document.getElementById('statusDot');
+const cycleCountEl = document.getElementById('cycle-count');
+const viewport = document.getElementById('viewport');
+
+function startLoops() {
+  degradationInterval = setInterval(() =&gt; {
+    if (isDead) return;
+    stats.hunger = Math.max(0, stats.hunger - 3);
+    stats.boredom = Math.max(0, stats.boredom - 4);
+    stats.affection = Math.max(0, stats.affection - 3);
+    updateUI();
+  }, 2500);
+
+  cycleInterval = setInterval(() =&gt; {
+    if (isDead) return;
+    cycles++;
+    cycleCountEl.textContent = cycles;
+
+    if (Math.random() &lt; 0.18 &amp;&amp; !isAnimating) {
+      triggerRandomEvent();
+    }
+  }, 4000);
+}
+
+function updateUI() {
+  barHunger.style.width = stats.hunger + '%';
+  barBoredom.style.width = stats.boredom + '%';
+  barAffection.style.width = stats.affection + '%';
+
+  applyColorClass(barHunger, stats.hunger);
+  applyColorClass(barBoredom, stats.boredom);
+  applyColorClass(barAffection, stats.affection);
+
+  if (stats.hunger &lt;= 0 || stats.boredom &lt;= 0 || stats.affection &lt;= 0) {
+    triggerDeath();
+    return;
+  }
+
+  // Si está en medio de una animación interactiva, no sobreescribir el aspecto visual
+  if (isAnimating) return;
+
+  if (stats.hunger &lt; 30 || stats.boredom &lt; 30 || stats.affection &lt; 30) {
+    bunnyRender.textContent = BUNNY_STATES.SAD;
+    bunnyRender.className = &quot;ascii-bunny bunny-shake&quot;;
+    consoleLog.innerHTML = `&lt;span class=&quot;danger&quot;&gt;warning://&lt;/span&gt; Constantes críticas. Requiere atención.`;
+    statusDot.style.background = 'var(--yellow)';
+    statusDot.style.boxShadow = '0 0 8px var(--yellow)';
+  } else {
+    bunnyRender.textContent = BUNNY_STATES.NORMAL;
+    bunnyRender.className = &quot;ascii-bunny bunny-idle&quot;;
+    statusDot.style.background = 'var(--accent)';
+    statusDot.style.boxShadow = '0 0 8px var(--accent)';
+  }
+}
+
+function applyColorClass(el, val) {
+  if (val &lt;= 25) el.className = 'stat-bar low';
+  else if (val &lt;= 50) el.className = 'stat-bar warning';
+  else el.className = 'stat-bar';
+}
+
+function triggerTemporaryState(asciiState, logMsg, bunnyAnimClass) {
+  if (isDead) return;
+  isAnimating = true;
+  if (actionTimeout) clearTimeout(actionTimeout);
+
+  bunnyRender.textContent = asciiState;
+  bunnyRender.className = `ascii-bunny ${bunnyAnimClass || ''}`;
+  consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; ${logMsg}`;
+
+  actionTimeout = setTimeout(() =&gt; {
+    isAnimating = false;
+    updateUI();
+  }, 1200);
+}
+
+function spawnVisualObject(emoji, cssClass) {
+  const obj = document.createElement('div');
+  obj.className = `anim-object ${cssClass}`;
+  obj.textContent = emoji;
+  viewport.appendChild(obj);
+  
+  setTimeout(() =&gt; obj.remove(), 1100);
+}
+
+function spawnHeartsBurst() {
+  for (let i = 0; i &lt; 5; i++) {
+    setTimeout(() =&gt; {
+      if (isDead) return;
+      const heart = document.createElement('div');
+      heart.className = 'particle';
+      heart.textContent = '❤️';
+      heart.style.left = (35 + Math.random() * 30) + '%';
+      viewport.appendChild(heart);
+      setTimeout(() =&gt; heart.remove(), 800);
+    }, i * 100);
+  }
+}
+
+function actionFeed() {
+  if (isDead || isAnimating) return;
+  stats.hunger = Math.min(100, stats.hunger + 22);
+  
+  spawnVisualObject('🥕', 'carrot-fall');
+  
+  setTimeout(() =&gt; {
+    triggerTemporaryState(BUNNY_STATES.EATING, &quot;Inyectando paquete alimenticio beta-01...&quot;, &quot;bunny-bounce&quot;);
+  }, 350);
+}
+
+function actionPlay() {
+  if (isDead || isAnimating) return;
+  stats.boredom = Math.min(100, stats.boredom + 25);
+  
+  spawnVisualObject('⚽', 'ball-bounce');
+  
+  setTimeout(() =&gt; {
+    triggerTemporaryState(BUNNY_STATES.HAPPY, &quot;Objeto pelota lanzado. Diversión en ejecución.&quot;, &quot;bunny-bounce&quot;);
+  }, 200);
+}
+
+function actionPet() {
+  if (isDead || isAnimating) return;
+  stats.affection = Math.min(100, stats.affection + 18);
+  
+  spawnVisualObject('🖐️', 'hand-pet');
+  
+  setTimeout(() =&gt; {
+    spawnHeartsBurst();
+    triggerTemporaryState(BUNNY_STATES.HAPPY, &quot;Pulso de afecto sincronizado correctamente.&quot;, &quot;bunny-bounce&quot;);
+  }, 250);
+}
+
+function triggerRandomEvent() {
+  const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  stats.hunger = Math.max(0, Math.min(100, stats.hunger + event.hunger));
+  stats.boredom = Math.max(0, Math.min(100, stats.boredom + event.boredom));
+  stats.affection = Math.max(0, Math.min(100, stats.affection + event.affection));
+  
+  let prefix = 'sys://';
+  if (event.type === 'warn') prefix = '&lt;span class=&quot;warn&quot;&gt;warn://&lt;/span&gt;';
+  if (event.type === 'danger') prefix = '&lt;span class=&quot;danger&quot;&gt;err://&lt;/span&gt;';
+  
+  consoleLog.innerHTML = `${prefix} ${event.msg}`;
+  updateUI();
+}
+
+function triggerDeath() {
+  isDead = true;
+  clearInterval(cycleInterval);
+  clearInterval(degradationInterval);
+  bunnyRender.textContent = BUNNY_STATES.DEAD;
+  bunnyRender.className = &quot;ascii-bunny&quot;;
+  consoleLog.innerHTML = `&lt;span class=&quot;danger&quot;&gt;error://&lt;/span&gt; Enlace roto. Conejo fuera de línea.`;
+  statusDot.style.background = 'var(--red)';
+  statusDot.style.boxShadow = '0 0 8px var(--red)';
+  document.getElementById('final-cycles').textContent = cycles;
+  deathOverlay.classList.add('active');
+}
+
+function resetTamagotchi() {
+  stats = { hunger: 100, boredom: 100, affection: 100 };
+  isDead = false;
+  isAnimating = false;
+  cycles = 0;
+  cycleCountEl.textContent = cycles;
+  deathOverlay.classList.remove('active');
+  consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo reiniciado. Reinstalando conejito...`;
+  updateUI();
+  startLoops();
+}
+
+// Inicialización limpia de hilos y renderizado
+bunnyRender.textContent = BUNNY_STATES.NORMAL;
+updateUI();
+startLoops();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;" style="width:100%;height:560px;border:none;display:block;background:#07080b" title="My Pet"></iframe>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-pet','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-pet','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-pet','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-pet','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-pet','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-pet','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-pet','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-pet','se')"></div>
+</div>
+
+
+<!-- SNAKE WINDOW -->
+<div class="window" id="win-snake">
+  <div class="titlebar" onmousedown="startDrag(event,'win-snake')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-snake')"></div>
+      <div class="dot min" onclick="maximizeWin('win-snake')"></div>
+      <div class="dot max" onclick="minimizeWin('win-snake')"></div>
+    </div>
+    <div class="win-title">snake.exe</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body" style="overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px;background:#050608">
+    <div style="font-family:var(--font-head);font-size:0.6rem;letter-spacing:3px;color:var(--accent)">SNAKE // v1.0</div>
+    <canvas id="snakeCanvas" width="320" height="320" style="border:1px solid var(--border2);display:block;image-rendering:pixelated"></canvas>
+    <div style="display:flex;gap:20px;align-items:center">
+      <span style="font-size:0.6rem;color:var(--muted2);letter-spacing:2px">SCORE: <span id="snakeScore" style="color:var(--accent)">0</span></span>
+      <span style="font-size:0.6rem;color:var(--muted2);letter-spacing:2px">BEST: <span id="snakeBest" style="color:var(--accent)">0</span></span>
+    </div>
+    <div style="font-size:0.55rem;color:var(--muted);letter-spacing:1px;text-align:center">WASD / ARROWS &mdash; SPACE to start/pause</div>
+    <div id="snakeMobileControls" style="display:none;flex-direction:column;align-items:center;gap:4px">
+      <button class="sn-btn" onclick="snakeDir(0,-1)">&#9650;</button>
+      <div style="display:flex;gap:4px">
+        <button class="sn-btn" onclick="snakeDir(-1,0)">&#9664;</button>
+        <button class="sn-btn" onclick="snakeTogglePause()" style="width:44px;font-size:0.6rem">&#9646;&#9646;</button>
+        <button class="sn-btn" onclick="snakeDir(1,0)">&#9654;</button>
+      </div>
+      <button class="sn-btn" onclick="snakeDir(0,1)">&#9660;</button>
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-snake','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-snake','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-snake','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-snake','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-snake','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-snake','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-snake','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-snake','se')"></div>
+</div>
+
+<style>
+.sn-btn{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border2);color:var(--accent);font-size:0.75rem;cursor:pointer;transition:all 0.1s;font-family:var(--font)}
+.sn-btn:hover{background:rgba(0,255,157,0.1);border-color:var(--accent)}
+.sn-btn:active{transform:scale(0.92)}
+</style>
+
+
+<script>
+// ── BOOT SEQUENCE ─────────────────────
+const bootLines = [
+  ['ok','BIOS v2.4.1 — hardware check OK'],
+  ['info','loading kernel modules...'],
+  ['ok','network interface UP — 192.168.1.x'],
+  ['ok','filesystem mounted'],
+  ['info','initializing robertts_OS...'],
+  ['ok','session started']
+];
+let li = 0;
+function bootStep(){
+  if(li >= bootLines.length){
+    setTimeout(()=>{
+      document.getElementById('boot').classList.add('hide');
+      setTimeout(()=>{ document.getElementById('boot').style.display='none'; openWin('win-about'); },600);
+    },400);
+    return;
+  }
+  const [type,msg] = bootLines[li++];
+  const d = document.createElement('div');
+  d.className='boot-log-line';
+  d.innerHTML=`<span class="${type}">[${type.toUpperCase()}]</span><span class="info">${msg}</span>`;
+  document.getElementById('bootLog').appendChild(d);
+  setTimeout(bootStep, 220);
+}
+setTimeout(bootStep, 600);
+
+// ── FLIPPER SRCDOC ────────────────────
+// Inject the flipper app into the iframe via srcdoc
+const flipperSrc = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Flipper IR Macro Builder</title><link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"><style>:root{--bg:#0a0c0f;--surface:#111318;--surface2:#181c23;--border:#1e2530;--accent:#ff6b00;--accent2:#ff9a40;--green:#39ff14;--dim:#3a4455;--text:#c8d4e8;--text-dim:#5a6a80;--danger:#ff3355}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:9999}body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,107,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 60px}header{padding:28px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px;display:flex;align-items:flex-end;gap:24px}.logo-block{display:flex;flex-direction:column;gap:4px}.logo-tag{font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}h1{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;text-shadow:0 0 30px rgba(255,107,0,0.4)}h1 span{color:var(--accent)}.header-badge{margin-left:auto;font-size:10px;letter-spacing:2px;color:var(--green);border:1px solid var(--green);padding:4px 10px;animation:blink 2s step-end infinite}@keyframes blink{50%{opacity:0.3}}.layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}.panel{background:var(--surface);border:1px solid var(--border);padding:16px}.panel-title{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}.panel-title::before{content:'';display:inline-block;width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px var(--accent)}.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}.sig-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .15s;letter-spacing:.5px;text-transform:uppercase}.sig-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,107,0,0.08);box-shadow:inset 0 0 12px rgba(255,107,0,0.1)}.sig-btn:active{transform:scale(0.96)}.custom-form{background:var(--surface2);border:1px solid var(--border);padding:12px;margin-bottom:14px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}.form-row.three{grid-template-columns:1fr 1fr 1fr}label{display:block;font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:4px}input,select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:7px 10px;outline:none;transition:border-color .15s}input:focus,select:focus{border-color:var(--accent)}select option{background:var(--bg)}.btn{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;padding:9px 16px;border:none;cursor:pointer;text-transform:uppercase;transition:all .15s}.btn-accent{background:var(--accent);color:#000;font-weight:700}.btn-accent:hover{background:var(--accent2);box-shadow:0 0 20px rgba(255,107,0,0.4)}.btn-outline{background:transparent;border:1px solid var(--dim);color:var(--text-dim)}.btn-outline:hover{border-color:var(--accent);color:var(--accent)}.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);font-size:9px;padding:5px 10px}.btn-danger:hover{background:rgba(255,51,85,0.1)}.btn-green{background:var(--green);color:#000;font-weight:700}.btn-full{width:100%;text-align:center}.macro-list{min-height:100px;margin-bottom:12px}.macro-empty{border:1px dashed var(--border);padding:24px;text-align:center;font-size:11px;color:var(--text-dim);letter-spacing:1px}.macro-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:4px;transition:all .15s;cursor:grab;animation:slideIn .2s ease}@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}.macro-item:hover{border-color:var(--dim)}.macro-item.dragging{opacity:.4;border-color:var(--accent)}.macro-item.drag-over{border-color:var(--accent);background:rgba(255,107,0,0.05)}.item-num{font-size:9px;color:var(--text-dim);width:18px;flex-shrink:0;text-align:right}.item-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0}.item-name{flex:1;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px}.delay-input{width:60px;padding:3px 6px;font-size:10px;background:var(--bg);border:1px solid var(--border);color:var(--accent);font-family:'Share Tech Mono',monospace;text-align:right}.macro-config{background:var(--surface2);border:1px solid var(--border);padding:12px;margin-bottom:14px}.config-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}.config-row label{margin:0;flex-shrink:0;width:120px}.config-row input{flex:1}.flipper-preview{display:flex;flex-direction:column;align-items:center;gap:4px;margin:14px 0}.flipper-screen{width:200px;height:80px;background:#1a2a1a;border:2px solid #2a4a2a;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);padding:6px 8px;position:relative;overflow:hidden}.flipper-screen::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(57,255,20,0.03) 50%);background-size:100% 3px;pointer-events:none}.screen-title{font-size:8px;letter-spacing:1px;border-bottom:1px solid rgba(57,255,20,0.2);padding-bottom:3px;margin-bottom:4px}.screen-item{font-size:8px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.screen-item.selected{background:var(--green);color:#000;padding:0 2px;opacity:1}.tab-bar{display:flex;gap:0;margin-bottom:0}.tab{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;padding:8px 14px;border:1px solid var(--border);border-bottom:none;cursor:pointer;color:var(--text-dim);background:var(--bg);text-transform:uppercase;transition:all .15s;margin-right:-1px}.tab.active{background:var(--surface);color:var(--accent);border-color:var(--accent);border-bottom-color:var(--surface);z-index:1}.tab-content{background:var(--surface);border:1px solid var(--border);padding:14px;display:none;position:relative}.tab-content.active{display:block}pre{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7eb8a0;white-space:pre;overflow-x:auto;line-height:1.6;max-height:260px;overflow-y:auto}.copy-btn{position:absolute;top:10px;right:10px;font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1px;padding:5px 10px;background:transparent;border:1px solid var(--dim);color:var(--text-dim);cursor:pointer;transition:all .15s}.copy-btn:hover{border-color:var(--accent);color:var(--accent)}.copy-btn.copied{border-color:var(--green);color:var(--green)}.stats-bar{display:flex;gap:16px;padding:8px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:14px}.stat{display:flex;flex-direction:column;gap:2px}.stat-val{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent)}.stat-label{font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase}.divider{height:1px;background:var(--border);margin:14px 0}.steps{display:flex;flex-direction:column;gap:8px;margin-top:10px}.step{display:flex;gap:10px;align-items:flex-start;font-size:10px;color:var(--text-dim);line-height:1.5}.step-num{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--accent);border:1px solid var(--accent);width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;padding:8px 20px;opacity:0;transition:all .3s;z-index:10000;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.drag-handle{color:var(--dim);cursor:grab;font-size:12px;padding:0 2px}::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--dim)}::-webkit-scrollbar-thumb:hover{background:var(--accent)}@media(max-width:700px){.layout{grid-template-columns:1fr}.signal-grid{grid-template-columns:repeat(3,1fr)}h1{font-size:20px}}</style></head><body><div class="wrap"><header><div class="logo-block"><span class="logo-tag">// Flipper Zero</span><h1>IR <span>MACRO</span> BUILDER</h1></div><div class="header-badge">&#x25CF; SYSTEM READY</div></header><div class="layout"><div><div class="panel"><div class="panel-title">Biblioteca de se&#241;ales</div><div id="categoryTabs" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button class="tab active" onclick="showCat('nav')" id="cat-nav">Navegaci&#243;n</button><button class="tab active" onclick="showCat('media')" id="cat-media" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">Media</button><button class="tab active" onclick="showCat('power')" id="cat-power" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">Power</button><button class="tab active" onclick="showCat('num')" id="cat-num" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">N&#250;meros</button></div><div id="sig-nav" class="signal-grid"></div><div id="sig-media" class="signal-grid" style="display:none"></div><div id="sig-power" class="signal-grid" style="display:none"></div><div id="sig-num" class="signal-grid" style="display:none"></div><div class="divider"></div><div class="panel-title" style="font-size:10px;">Se&#241;al personalizada</div><div class="custom-form"><div class="form-row"><div><label>Nombre</label><input type="text" id="cName" placeholder="Mi_Se&#241;al"/></div><div><label>Protocolo</label><select id="cProto"><option>NEC</option><option>NECext</option><option>Samsung32</option><option>RC6</option><option>RC5</option><option>SIRC</option><option>SIRC15</option><option>SIRC20</option><option>RCA</option><option>Raw</option></select></div></div><div class="form-row three"><div><label>Address (hex)</label><input type="text" id="cAddr" placeholder="0x00"/></div><div><label>Command (hex)</label><input type="text" id="cCmd" placeholder="0x00"/></div><div><label>Delay (ms)</label><input type="number" id="cDelay" value="200" min="0" max="9999"/></div></div><button class="btn btn-outline btn-full" onclick="addCustom()">+ A&#241;adir se&#241;al personalizada</button></div></div></div><div><div class="panel" style="margin-bottom:14px;"><div class="panel-title">Configuraci&#243;n del macro</div><div class="macro-config"><div class="config-row"><label>Nombre bot&#243;n</label><input type="text" id="macroName" value="My_Macro" maxlength="32"/></div><div class="config-row"><label>Delay global (ms)</label><input type="number" id="globalDelay" value="200" min="0" max="9999"/></div><div class="config-row"><label>Repeticiones</label><input type="number" id="repeatCount" value="1" min="1" max="10"/></div></div><div class="flipper-preview"><div class="flipper-screen" id="flipperScreen"><div class="screen-title">IR REMOTE &#9658; MY_MACRO</div><div id="screenItems"></div></div><span style="font-size:9px;color:var(--text-dim);letter-spacing:2px;">PREVIEW</span></div></div><div class="panel"><div class="panel-title">Secuencia del macro<span style="margin-left:auto;font-size:9px;color:var(--text-dim);" id="itemCount">0 se&#241;ales</span></div><div class="stats-bar"><div class="stat"><span class="stat-val" id="statCount">0</span><span class="stat-label">Se&#241;ales</span></div><div class="stat"><span class="stat-val" id="statTime">0ms</span><span class="stat-label">Tiempo total</span></div><div class="stat"><span class="stat-val" id="statSize">0B</span><span class="stat-label">Tama&#241;o .ir</span></div></div><div class="macro-list" id="macroList"><div class="macro-empty" id="emptyMsg">// Pulsa se&#241;ales de la biblioteca<br>para a&#241;adirlas a la secuencia</div></div><div style="display:flex;gap:8px;"><button class="btn btn-outline" onclick="clearMacro()" style="flex:1;">&#10005; Limpiar</button><button class="btn btn-outline" onclick="duplicateLast()" style="flex:1;">&#10697; Duplicar &#250;ltimo</button></div><div class="divider"></div><div class="tab-bar"><div class="tab active" onclick="switchTab('ir')">archivo .ir</div><div class="tab" onclick="switchTab('c')">c&#243;digo C</div><div class="tab" onclick="switchTab('guide')">gu&#237;a</div></div><div class="tab-content active" id="tab-ir"><button class="copy-btn" onclick="copyCode('ir')">COPIAR</button><pre id="code-ir">// A&#241;ade se&#241;ales para ver el archivo .ir</pre><div style="margin-top:10px;"><button class="btn btn-accent btn-full" onclick="downloadFile('ir')">&#11015; Descargar .ir</button></div></div><div class="tab-content" id="tab-c"><button class="copy-btn" onclick="copyCode('c')">COPIAR</button><pre id="code-c">// A&#241;ade se&#241;ales para generar el c&#243;digo C</pre><div style="margin-top:10px;"><button class="btn btn-accent btn-full" onclick="downloadFile('c')">&#11015; Descargar .c</button></div></div><div class="tab-content" id="tab-guide"><div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.7;"><div style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:10px;">C&#211;MO USAR EL ARCHIVO .IR</div><div class="steps"><div class="step"><div class="step-num">1</div><span>Descarga el archivo <b style="color:var(--text);">.ir</b> generado</span></div><div class="step"><div class="step-num">2</div><span>C&#243;pialo a la SD del Flipper en: <b style="color:var(--green);">SD/infrared/</b></span></div><div class="step"><div class="step-num">3</div><span>En Flipper: <b style="color:var(--text);">Infrared &#8594; Open file</b> &#8594; selecciona tu archivo</span></div><div class="step"><div class="step-num">4</div><span>Aparece tu bot&#243;n macro. Puls&#225;ndolo env&#237;a toda la secuencia</span></div></div><div class="divider"></div><div style="color:var(--text-dim);font-size:9px;line-height:1.8;">&#9888; El .ir es el m&#233;todo m&#225;s simple y no requiere compilaci&#243;n.<br>El c&#243;digo C crea una app nativa en el men&#250; del Flipper.</div></div></div></div></div></div></div><div class="toast" id="toast"></div><scr"+"ipt>const SIGNALS={nav:[{name:'Up',icon:'↑',address:'0x00',command:'0x0C',protocol:'NEC'},{name:'Down',icon:'↓',address:'0x00',command:'0x0D',protocol:'NEC'},{name:'Left',icon:'←',address:'0x00',command:'0x0E',protocol:'NEC'},{name:'Right',icon:'→',address:'0x00',command:'0x0F',protocol:'NEC'},{name:'OK',icon:'✓',address:'0x00',command:'0x0B',protocol:'NEC'},{name:'Back',icon:'⬅',address:'0x00',command:'0x28',protocol:'NEC'},{name:'Menu',icon:'☰',address:'0x00',command:'0x40',protocol:'NEC'},{name:'Home',icon:'⌂',address:'0x00',command:'0x09',protocol:'NEC'},{name:'Source',icon:'⊙',address:'0x00',command:'0x02',protocol:'NEC'},{name:'Options',icon:'⚙',address:'0x00',command:'0x4A',protocol:'NEC'},{name:'Info',icon:'ℹ',address:'0x00',command:'0x0A',protocol:'NEC'},{name:'Guide',icon:'📋',address:'0x00',command:'0x4C',protocol:'NEC'}],media:[{name:'Play',icon:'▶',address:'0x00',command:'0x30',protocol:'NEC'},{name:'Pause',icon:'⏸',address:'0x00',command:'0x31',protocol:'NEC'},{name:'Stop',icon:'⏹',address:'0x00',command:'0x32',protocol:'NEC'},{name:'Prev',icon:'⏮',address:'0x00',command:'0x33',protocol:'NEC'},{name:'Next',icon:'⏭',address:'0x00',command:'0x34',protocol:'NEC'},{name:'Vol+',icon:'🔊',address:'0x00',command:'0x10',protocol:'NEC'},{name:'Vol-',icon:'🔉',address:'0x00',command:'0x11',protocol:'NEC'},{name:'Mute',icon:'🔇',address:'0x00',command:'0x0F',protocol:'NEC'},{name:'Ch+',icon:'🔼',address:'0x00',command:'0x1E',protocol:'NEC'},{name:'Ch-',icon:'🔽',address:'0x00',command:'0x1F',protocol:'NEC'},{name:'Rec',icon:'⏺',address:'0x00',command:'0x37',protocol:'NEC'},{name:'Sub',icon:'💬',address:'0x00',command:'0x4F',protocol:'NEC'}],power:[{name:'Power',icon:'⏻',address:'0x00',command:'0x08',protocol:'NEC'},{name:'Sleep',icon:'😴',address:'0x00',command:'0x3B',protocol:'NEC'},{name:'Wake',icon:'☀',address:'0x00',command:'0x3C',protocol:'NEC'},{name:'Standby',icon:'⏼',address:'0x00',command:'0x1A',protocol:'NEC'}],num:[{name:'0',icon:'0',address:'0x00',command:'0x00',protocol:'NEC'},{name:'1',icon:'1',address:'0x00',command:'0x01',protocol:'NEC'},{name:'2',icon:'2',address:'0x00',command:'0x02',protocol:'NEC'},{name:'3',icon:'3',address:'0x00',command:'0x03',protocol:'NEC'},{name:'4',icon:'4',address:'0x00',command:'0x04',protocol:'NEC'},{name:'5',icon:'5',address:'0x00',command:'0x05',protocol:'NEC'},{name:'6',icon:'6',address:'0x00',command:'0x06',protocol:'NEC'},{name:'7',icon:'7',address:'0x00',command:'0x07',protocol:'NEC'},{name:'8',icon:'8',address:'0x00',command:'0x08',protocol:'NEC'},{name:'9',icon:'9',address:'0x00',command:'0x09',protocol:'NEC'}]};let macro=[],dragSrcIdx=null;function init(){Object.entries(SIGNALS).forEach(([cat,sigs])=>{const grid=document.getElementById('sig-'+cat);sigs.forEach(sig=>{const btn=document.createElement('button');btn.className='sig-btn';btn.innerHTML=\`<div style="font-size:16px;margin-bottom:2px;">\${sig.icon}</div>\${sig.name}\`;btn.onclick=()=>addSignal({...sig,delay:parseInt(document.getElementById('globalDelay').value)||200});grid.appendChild(btn)})});}function showCat(cat){['nav','media','power','num'].forEach(c=>{document.getElementById('sig-'+c).style.display=c===cat?'grid':'none'});}function addSignal(sig){macro.push({...sig,id:Date.now()+Math.random()});render();showToast('+ '+sig.name+' añadido');}function addCustom(){const name=document.getElementById('cName').value.trim()||'Custom';const proto=document.getElementById('cProto').value;const addr=document.getElementById('cAddr').value.trim()||'0x00';const cmd=document.getElementById('cCmd').value.trim()||'0x00';const delay=parseInt(document.getElementById('cDelay').value)||200;addSignal({name,protocol:proto,address:addr,command:cmd,icon:'⚡',delay});}function clearMacro(){macro=[];render();}function duplicateLast(){if(!macro.length)return;const last={...macro[macro.length-1],id:Date.now()+Math.random()};macro.push(last);render();}function removeItem(idx){macro.splice(idx,1);render();}function render(){const list=document.getElementById('macroList');if(!macro.length){list.innerHTML='<div class="macro-empty" id="emptyMsg">// Pulsa señales de la biblioteca<br>para añadirlas a la secuencia</div>';}else{list.innerHTML='';macro.forEach((item,i)=>{const el=document.createElement('div');el.className='macro-item';el.draggable=true;el.dataset.idx=i;el.innerHTML=\`<span class="drag-handle">⠿</span><span class="item-num">\${String(i+1).padStart(2,'0')}</span><span class="item-icon">\${item.icon||'▸'}</span><span class="item-name">\${item.name}</span><input class="delay-input" type="number" value="\${item.delay}" min="0" max="9999" oninput="macro[\${i}].delay=parseInt(this.value)||0;updateStats();generateCode();" title="Delay en ms"/><span style="font-size:9px;color:var(--text-dim);">ms</span><button class="btn btn-danger" onclick="removeItem(\${i})">✕</button>\`;el.addEventListener('dragstart',e=>{dragSrcIdx=i;el.classList.add('dragging')});el.addEventListener('dragend',e=>{el.classList.remove('dragging');document.querySelectorAll('.macro-item').forEach(x=>x.classList.remove('drag-over'))});el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over')});el.addEventListener('dragleave',e=>el.classList.remove('drag-over'));el.addEventListener('drop',e=>{e.preventDefault();if(dragSrcIdx!==null&&dragSrcIdx!==i){const moved=macro.splice(dragSrcIdx,1)[0];macro.splice(i,0,moved);render();}});list.appendChild(el);});}updateStats();updatePreview();generateCode();}function updateStats(){const count=macro.length;const time=macro.reduce((s,x)=>s+(x.delay||0),0);const irSize=generateIR().length;document.getElementById('statCount').textContent=count;document.getElementById('statTime').textContent=time>=1000?(time/1000).toFixed(1)+'s':time+'ms';document.getElementById('statSize').textContent=irSize<1024?irSize+'B':(irSize/1024).toFixed(1)+'KB';document.getElementById('itemCount').textContent=count+' señal'+(count!==1?'es':'');}function updatePreview(){const name=document.getElementById('macroName').value||'MY_MACRO';const title=document.querySelector('.screen-title');if(title)title.textContent='IR REMOTE ▸ '+name.toUpperCase();const items=document.getElementById('screenItems');items.innerHTML='';const shown=macro.slice(0,5);shown.forEach((item,i)=>{const d=document.createElement('div');d.className='screen-item'+(i===0?' selected':'');d.textContent=\`▸ \${item.name.toUpperCase()} (\${item.delay}ms)\`;items.appendChild(d);});if(macro.length>5){const d=document.createElement('div');d.className='screen-item';d.textContent=\`  ...+\${macro.length-5} más\`;items.appendChild(d);}}function generateIR(){const name=(document.getElementById('macroName').value||'My_Macro').replace(/\\s/g,'_');const repeats=parseInt(document.getElementById('repeatCount').value)||1;let lines=['Filetype: IR signals file','Version: 1','#'];lines.push(\`# Macro: \${name}\`);lines.push('# Generado por Flipper IR Macro Builder');lines.push(\`# Señales: \${macro.length} | Repeticiones: \${repeats}\`);lines.push('#');lines.push('');macro.forEach((item,i)=>{lines.push(\`name: \${name}_\${String(i+1).padStart(2,'0')}_\${item.name.replace(/\\s/g,'_')}\`);lines.push('type: parsed');lines.push(\`protocol: \${item.protocol||'NEC'}\`);lines.push(\`address: \${item.address||'0x00'} 00 00 00\`);lines.push(\`command: \${item.command||'0x00'} 00 00 00\`);lines.push('');});return lines.join('\\n');}function generateC(){const name=(document.getElementById('macroName').value||'My_Macro').replace(/\\s/g,'_');const repeats=parseInt(document.getElementById('repeatCount').value)||1;const sigStructs=macro.map((item,i)=>{const proto=item.protocol||'NEC';const addr=parseInt(item.address)||0;const cmd=parseInt(item.command)||0;const delay=item.delay||200;return\`    { "\${item.name}", InfraredProtocol\${proto}, 0x\${addr.toString(16).toUpperCase().padStart(2,'0')}, 0x\${cmd.toString(16).toUpperCase().padStart(2,'0')}, \${delay} }\`;}).join(',\\n');return\`/**\\n * IR Macro: \${name}\\n * Generado por Flipper IR Macro Builder\\n */\\n\\n#include <furi.h>\\n#include <furi_hal_infrared.h>\\n#include <infrared.h>\\n\\n#define MACRO_NAME "\${name}"\\n#define MACRO_REPEATS \${repeats}\\n\\ntypedef struct {\\n    const char* name;\\n    InfraredProtocol protocol;\\n    uint32_t address;\\n    uint32_t command;\\n    uint32_t delay_ms;\\n} IrSignal;\\n\\nstatic const IrSignal macro_signals[] = {\\n\${sigStructs}\\n};\\n\`;}function generateCode(){document.getElementById('code-ir').textContent=macro.length?generateIR():'// Añade señales para ver el archivo .ir';document.getElementById('code-c').textContent=macro.length?generateC():'// Añade señales para generar el código C';}function switchTab(id){document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['ir','c','guide'][i]===id)});document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}function copyCode(type){const text=document.getElementById('code-'+type).textContent;navigator.clipboard.writeText(text).then(()=>{const btn=event.target;btn.textContent='✓ COPIADO';btn.classList.add('copied');setTimeout(()=>{btn.textContent='COPIAR';btn.classList.remove('copied')},2000)});}function downloadFile(type){const name=(document.getElementById('macroName').value||'My_Macro').replace(/\\s/g,'_');let content,filename,mime;if(type==='ir'){content=generateIR();filename=name+'.ir';mime='text/plain';}else{content=generateC();filename='ir_macro.c';mime='text/x-csrc';}const blob=new Blob([content],{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();showToast('Descargando '+filename);}function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}document.addEventListener('DOMContentLoaded',()=>{init();document.getElementById('macroName').addEventListener('input',()=>{updatePreview();generateCode();});document.getElementById('globalDelay').addEventListener('input',generateCode);document.getElementById('repeatCount').addEventListener('input',generateCode);});<\/script></body></html>`
+document.getElementById('flipperFrame').srcdoc = flipperSrc;
+
+
+// ── CLOCK ─────────────────────────────
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── WINDOW MANAGER ────────────────────
+let topZ=200;
+const openWins=new Set();
+const winSavedGeo={};
+
+function openWin(id){
+  const w=document.getElementById(id);
+  if(!w)return;
+  if(w.classList.contains('minimized')){
+    w.classList.remove('minimized');
+    w.style.display='flex';
+    focus(id);updateTaskbar();
+    if(id==='win-snake')snakeResume();
+    return;
+  }
+  if(w.classList.contains('open')){focus(id);return;}
+  w.classList.add('open');
+  openWins.add(id);
+  focus(id);
+  if(!w.dataset.placed){
+    const dw=window.innerWidth,dh=window.innerHeight-36;
+    const ww=w.offsetWidth,wh=w.offsetHeight;
+    w.style.left=Math.max(100,Math.min((dw-ww)/2+(Math.random()-.5)*100,dw-ww-20))+'px';
+    w.style.top =Math.max(20, Math.min((dh-wh)/2+(Math.random()-.5)*60, dh-wh-20))+'px';
+    w.dataset.placed='1';
+  }
+  updateTaskbar();
+  if(id==='win-snake')snakeInit();
+}
+
+function closeWin(id){
+  const w=document.getElementById(id);
+  w.classList.remove('open','focused','minimized','maximized');
+  openWins.delete(id);
+  updateTaskbar();
+  if(id==='win-snake')snakeStop();
+}
+
+function minimizeWin(id){
+  const w=document.getElementById(id);
+  if(!w||!w.classList.contains('open'))return;
+  w.classList.add('minimized');
+  w.style.display='none';
+  document.querySelectorAll('.window').forEach(x=>x.classList.remove('focused'));
+  updateTaskbar();
+  if(id==='win-snake')snakePause();
+}
+
+function maximizeWin(id){
+  const w=document.getElementById(id);
+  if(!w)return;
+  if(w.classList.contains('maximized')){
+    w.classList.remove('maximized');
+    const g=winSavedGeo[id];
+    if(g){w.style.left=g.l;w.style.top=g.t;w.style.width=g.w;w.style.height=g.h;}
+  } else {
+    winSavedGeo[id]={l:w.style.left,t:w.style.top,w:w.style.width,h:w.style.height};
+    w.classList.add('maximized');
+    w.style.left='0px';w.style.top='0px';
+    w.style.width=window.innerWidth+'px';
+    w.style.height=(window.innerHeight-36)+'px';
+  }
+  focus(id);
+}
+
+function focus(id){
+  document.querySelectorAll('.window').forEach(w=>w.classList.remove('focused'));
+  const w=document.getElementById(id);
+  topZ++;w.style.zIndex=topZ;
+  w.classList.add('focused');
+  updateTaskbar();
+}
+
+function updateTaskbar(){
+  const c=document.getElementById('tbWins');c.innerHTML='';
+  openWins.forEach(id=>{
+    const w=document.getElementById(id);
+    const t=w.querySelector('.win-title')?.textContent||id;
+    const b=document.createElement('div');
+    const isMin=w.classList.contains('minimized');
+    b.className='tb-win'+(w.classList.contains('focused')&&!isMin?' active':'')+(isMin?' tb-minimized':'');
+    b.textContent=isMin?'['+t+']':t;
+    b.onclick=()=>openWin(id);
+    c.appendChild(b);
+  });
+}
+
+// ── DRAG ──────────────────────────────
+function startDrag(e,id){
+  const w=document.getElementById(id);
+  if(w.classList.contains('maximized'))return;
+  focus(id);w.dataset.placed='1';
+  const ox=e.clientX-w.offsetLeft,oy=e.clientY-w.offsetTop;
+  function mv(e){w.style.left=Math.max(0,e.clientX-ox)+'px';w.style.top=Math.max(0,e.clientY-oy)+'px';}
+  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+
+// ── RESIZE ────────────────────────────
+function startResize(e,id,dir){
+  e.stopPropagation();e.preventDefault();
+  const w=document.getElementById(id);
+  if(w.classList.contains('maximized'))return;
+  focus(id);
+  const sx=e.clientX,sy=e.clientY;
+  const sw=w.offsetWidth,sh=w.offsetHeight;
+  const sl=w.offsetLeft,st=w.offsetTop;
+  const minW=240,minH=140;
+  function mv(e){
+    const dx=e.clientX-sx,dy=e.clientY-sy;
+    let nl=sl,nt=st,nw=sw,nh=sh;
+    if(dir.includes('e'))nw=Math.max(minW,sw+dx);
+    if(dir.includes('s'))nh=Math.max(minH,sh+dy);
+    if(dir.includes('w')){nw=Math.max(minW,sw-dx);nl=sl+sw-nw;}
+    if(dir.includes('n')){nh=Math.max(minH,sh-dy);nt=st+sh-nh;}
+    w.style.width=nw+'px';w.style.height=nh+'px';
+    w.style.left=nl+'px';w.style.top=nt+'px';
+    w.dataset.placed='1';
+  }
+  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+
+// ── START MENU ────────────────────────
+function toggleMenu(){document.getElementById('startmenu').classList.toggle('open');}
+function closeMenu(){document.getElementById('startmenu').classList.remove('open');}
+document.addEventListener('click',e=>{
+  const m=document.getElementById('startmenu'),b=document.querySelector('.tb-brand');
+  if(!m.contains(e.target)&&e.target!==b)m.classList.remove('open');
+});
+document.querySelectorAll('.window').forEach(w=>w.addEventListener('mousedown',()=>focus(w.id)));
+
+// ── SNAKE GAME ────────────────────────
+const SN_COLS=20,SN_ROWS=20,SN_CELL=16;
+let snakeParts=[],snakeDx=1,snakeDy=0,snakeFood={},snakeRunning=false,snakePaused=false,snakeInterval=null,snakeScore=0,snakeBestScore=0,snakeDead=false;
+
+function snakeInit(){
+  const mob=window.innerWidth<=600;
+  const mc=document.getElementById('snakeMobileControls');
+  if(mc)mc.style.display=mob?'flex':'none';
+  snakeStop();
+  snakeParts=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  snakeDx=1;snakeDy=0;snakeRunning=false;snakePaused=false;snakeScore=0;snakeDead=false;
+  const sc=document.getElementById('snakeScore');if(sc)sc.textContent='0';
+  snakePlaceFood();snakeDraw('PRESS SPACE');
+}
+function snakeStop(){clearInterval(snakeInterval);snakeInterval=null;snakeRunning=false;snakePaused=false;}
+function snakePause(){if(snakeRunning&&!snakePaused){snakePaused=true;clearInterval(snakeInterval);snakeInterval=null;}}
+function snakeResume(){if(snakePaused){snakePaused=false;snakeTick();}}
+function snakeTogglePause(){if(snakeDead)return;if(!snakeRunning){snakeStart();return;}snakePaused?snakeResume():snakePause();}
+function snakeStart(){if(snakeRunning)return;snakeRunning=true;snakePaused=false;snakeTick();}
+function snakeTick(){clearInterval(snakeInterval);snakeInterval=setInterval(snakeStep,160);}
+function snakePlaceFood(){
+  let p;
+  do{p={x:Math.floor(Math.random()*SN_COLS),y:Math.floor(Math.random()*SN_ROWS)};}
+  while(snakeParts.some(s=>s.x===p.x&&s.y===p.y));
+  snakeFood=p;
+}
+function snakeStep(){
+  const h={x:snakeParts[0].x+snakeDx,y:snakeParts[0].y+snakeDy};
+  if(h.x<0||h.x>=SN_COLS||h.y<0||h.y>=SN_ROWS||snakeParts.some(p=>p.x===h.x&&p.y===h.y)){snakeGameOver();return;}
+  snakeParts.unshift(h);
+  if(h.x===snakeFood.x&&h.y===snakeFood.y){
+    snakeScore++;
+    const sc=document.getElementById('snakeScore');if(sc)sc.textContent=snakeScore;
+    if(snakeScore>snakeBestScore){snakeBestScore=snakeScore;const sb=document.getElementById('snakeBest');if(sb)sb.textContent=snakeBestScore;}
+    snakePlaceFood();
+  } else {snakeParts.pop();}
+  snakeDraw();
+}
+function snakeGameOver(){
+  snakeStop();snakeDead=true;snakeDraw('GAME OVER');
+  const cv=document.getElementById('snakeCanvas');
+  if(!cv)return;
+  const wb=cv.parentElement;
+  let rb=document.getElementById('snakeResetBtn');
+  if(!rb){
+    rb=document.createElement('button');
+    rb.id='snakeResetBtn';
+    rb.className='sn-btn';
+    rb.style.cssText='padding:6px 20px;width:auto;font-size:0.6rem;letter-spacing:2px;font-family:var(--font-head)';
+    rb.textContent='RESET';
+    rb.onclick=function(){rb.remove();snakeInit();snakeStart();};
+    wb.insertBefore(rb,cv.nextSibling);
+  }
+}
+function snakeDir(dx,dy){
+  if(snakeDead)return;
+  if(!snakeRunning)snakeStart();
+  if(snakePaused)snakeResume();
+  if(dx===-snakeDx&&dy===-snakeDy)return;
+  snakeDx=dx;snakeDy=dy;
+}
+function snakeDraw(msg){
+  const cv=document.getElementById('snakeCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#07080b';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='#1c2030';ctx.lineWidth=0.5;
+  for(let x=0;x<=SN_COLS;x++){ctx.beginPath();ctx.moveTo(x*SN_CELL,0);ctx.lineTo(x*SN_CELL,SN_ROWS*SN_CELL);ctx.stroke();}
+  for(let y=0;y<=SN_ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*SN_CELL);ctx.lineTo(SN_COLS*SN_CELL,y*SN_CELL);ctx.stroke();}
+  ctx.fillStyle='#ff3355';ctx.shadowColor='#ff3355';ctx.shadowBlur=8;
+  ctx.fillRect(snakeFood.x*SN_CELL+2,snakeFood.y*SN_CELL+2,SN_CELL-4,SN_CELL-4);
+  ctx.shadowBlur=0;
+  snakeParts.forEach((p,i)=>{
+    ctx.fillStyle=i===0?'#00ffcc':'#00ff9d';
+    ctx.shadowColor=i===0?'#00ffcc':'#00ff9d';ctx.shadowBlur=i===0?10:4;
+    ctx.fillRect(p.x*SN_CELL+1,p.y*SN_CELL+1,SN_CELL-2,SN_CELL-2);
+  });
+  ctx.shadowBlur=0;
+  if(msg){
+    ctx.fillStyle='rgba(7,8,11,0.75)';ctx.fillRect(0,SN_ROWS*SN_CELL/2-22,SN_COLS*SN_CELL,44);
+    ctx.fillStyle='#00ff9d';ctx.font='bold 13px Orbitron,monospace';ctx.textAlign='center';
+    ctx.shadowColor='#00ff9d';ctx.shadowBlur=12;
+    ctx.fillText(msg,SN_COLS*SN_CELL/2,SN_ROWS*SN_CELL/2+5);ctx.shadowBlur=0;
+  }
+}
+document.addEventListener('keydown',e=>{
+  const ws=document.getElementById('win-snake');
+  if(!ws||!ws.classList.contains('open')||ws.classList.contains('minimized'))return;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d',' '].includes(e.key))e.preventDefault();
+  switch(e.key){
+    case 'ArrowUp':case 'w':snakeDir(0,-1);break;
+    case 'ArrowDown':case 's':snakeDir(0,1);break;
+    case 'ArrowLeft':case 'a':snakeDir(-1,0);break;
+    case 'ArrowRight':case 'd':snakeDir(1,0);break;
+    case ' ':snakeTogglePause();break;
+  }
+});
+// Dynamic styles for maximized/minimized
+const _ds=document.createElement('style');
+_ds.textContent='.window.maximized{border-radius:0!important}.tb-minimized{opacity:0.55;font-style:italic}';
+document.head.appendChild(_ds);
+</script>
+</body>
+</html>
