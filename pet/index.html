@@ -1,1 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>bunnY_sys // tamagotchi v2.9</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght=400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+:root {
+  --bg: #07080b;
+  --surface: #0d0f14;
+  --surface2: #111420;
+  --border: #1c2030;
+  --border2: #252a3a;
+  --accent: #00ff9d;
+  --accent-dim: #00cc7a;
+  --accent-glow: rgba(0, 255, 157, 0.15);
+  --red: #ff3355;
+  --yellow: #f0c040;
+  --text: #b8c8d8;
+  --muted: #3a4a5a;
+  --muted2: #556070;
+  --font: 'Share Tech Mono', monospace;
+  --font-head: 'Orbitron', sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, 0.06) 3px, rgba(0, 0, 0, 0.06) 4px);
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.tama-container {
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 30px rgba(0, 255, 157, 0.06), 0 20px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.tama-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+  user-select: none;
+}
+
+.tama-title {
+  font-family: var(--font-head);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.score-panel {
+  font-size: 0.65rem;
+  color: var(--muted2);
+}
+.score-panel span { color: var(--text); }
+
+.tama-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: blink 2s step-end infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.tama-screen {
+  padding: 16px;
+  background: #050608;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+}
+
+.stat-label {
+  color: var(--muted2);
+}
+
+.stat-bar-container {
+  width: 180px;
+  height: 6px;
+  background: var(--border);
+  border: 1px solid var(--border2);
+  position: relative;
+}
+
+.stat-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.stat-bar.low {
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+}
+
+.stat-bar.warning {
+  background: var(--yellow);
+}
+
+/* VIEWPORT OPTIMIZADO */
+.viewport {
+  height: 140px;
+  border: 1px dashed var(--border2);
+  background: rgba(0, 255, 157, 0.01);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.viewport:hover {
+  background: rgba(0, 255, 157, 0.03);
+}
+
+.ascii-bunny {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  font-family: monospace;
+  white-space: pre;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+/* Animación estática por defecto */
+.bunny-idle {
+  animation: idle-breathing 2.5s ease-in-out infinite;
+}
+
+@keyframes idle-breathing {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(0.93) scaleX(1.04) translateY(1px); }
+}
+
+/* Animaciones reactivas forzadas */
+.bunny-bounce {
+  animation: jump-bounce 0.5s cubic-bezier(0.25, 1, 0.5, 1) 1 !important;
+}
+@keyframes jump-bounce {
+  0%, 100% { transform: scale(1) translateY(0); }
+  40% { transform: scale(0.85, 1.2) translateY(-22px); }
+  75% { transform: scale(1.15, 0.85) translateY(0); }
+}
+
+.bunny-shake {
+  animation: fast-shake 0.25s ease-in-out infinite !important;
+}
+@keyframes fast-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* --- OBJETOS FLOTANTES (EMOJIS) --- */
+.anim-object {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Zanahoria cayendo en su boca */
+.carrot-fall {
+  animation: carrot-anim 0.8s ease-in forwards;
+}
+@keyframes carrot-anim {
+  0% { top: -40px; opacity: 0; transform: translateX(-50%) scale(0.6); }
+  30% { opacity: 1; }
+  70% { top: 40px; transform: translateX(-50%) rotate(25deg) scale(1.1); opacity: 1; }
+  100% { top: 65px; transform: translateX(-50%) scale(0); opacity: 0; }
+}
+
+/* Pelota rebotando */
+.ball-bounce {
+  animation: ball-anim 1s ease-in-out forwards;
+}
+@keyframes ball-anim {
+  0% { left: 10%; top: 20px; transform: rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  50% { left: 50%; top: 65px; transform: rotate(180deg); }
+  75% { left: 75%; top: 25px; transform: rotate(270deg); opacity: 1; }
+  100% { left: 95%; top: 75px; transform: rotate(360deg); opacity: 0; }
+}
+
+/* Mano haciendo mimos */
+.hand-pet {
+  animation: hand-anim 1s ease-in-out forwards;
+}
+@keyframes hand-anim {
+  0% { top: -40px; opacity: 0; }
+  30%, 70% { top: 10px; transform: translateX(-50%) rotate(-15deg); opacity: 1; }
+  50% { top: 8px; transform: translateX(-50%) rotate(15deg); opacity: 1; }
+  100% { top: -40px; opacity: 0; }
+}
+
+/* Corazones flotantes */
+.particle {
+  position: absolute;
+  font-size: 1.2rem;
+  pointer-events: none;
+  animation: float-up 0.8s ease-out forwards;
+  z-index: 6;
+}
+@keyframes float-up {
+  0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(10px) scale(1.5); opacity: 0; }
+}
+
+.console-log {
+  font-size: 0.62rem;
+  color: var(--muted2);
+  height: 32px;
+  line-height: 32px;
+  padding: 0 8px;
+  background: #030406;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console-log span { color: var(--accent); }
+.console-log span.warn { color: var(--yellow); }
+.console-log span.danger { color: var(--red); }
+
+.controls-panel {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: var(--surface);
+}
+
+.btn-action {
+  font-family: var(--font);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.btn-action:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0, 255, 157, 0.05);
+}
+
+.btn-action:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 8, 11, 0.96);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 10;
+}
+
+.overlay.active {
+  display: flex !important;
+}
+
+.overlay-title {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  color: var(--red);
+  letter-spacing: 2px;
+  animation: glitch-text 1s linear infinite;
+}
+
+@keyframes glitch-text {
+  0%, 100% { text-shadow: 2px 0 0 rgba(255,0,0,0.5), -2px 0 0 rgba(0,255,255,0.5); }
+  50% { text-shadow: -2px 0 0 rgba(255,0,0,0.5), 2px 0 0 rgba(0,255,255,0.5); }
+}
+</style>
+</head>
+<body>
+
+<div class="tama-container">
+  <div class="tama-header">
+    <div class="tama-title">BUNNY_CORE_v2.9</div>
+    <div class="score-panel">CICLOS: <span id="cycle-count">0</span></div>
+    <div class="tama-status-dot" id="statusDot"></div>
+  </div>
+
+  <div class="tama-screen">
+    <div class="stats-panel">
+      <div class="stat-row">
+        <span class="stat-label">ALIMENTACIÓN //</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar" id="bar-hunger"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">ENTRETENIMIENTO //</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar" id="bar-boredom"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">AFECTO //</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar" id="bar-affection"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="viewport" id="viewport" onclick="actionPet()">
+      <div class="ascii-bunny bunny-idle" id="bunny-render"></div>
+    </div>
+
+    <div class="console-log" id="consoleLog">sys:// conejito.sh inicializado.</div>
+  </div>
+
+  <div class="controls-panel">
+    <button class="btn-action" onclick="actionFeed()">Alimentar</button>
+    <button class="btn-action" onclick="actionPlay()">Jugar</button>
+    <button class="btn-action" onclick="actionPet()">Acariciar</button>
+  </div>
+
+  <div class="overlay" id="death-overlay">
+    <div class="overlay-title">SYSTEM FAILURE</div>
+    <div style="font-size:0.65rem; color:var(--muted2); text-align:center; line-height:1.6;">
+      El espécimen digital ha expirado.<br>Ciclos totales sobrevividos: <span id="final-cycles" style="color:var(--text)">0</span>
+    </div>
+    <button class="btn-action" onclick="resetTamagotchi()" style="width:120px; margin-top:8px;">Reiniciar</button>
+  </div>
+</div>
+
+<script>
+let stats = { hunger: 100, boredom: 100, affection: 100 };
+let isDead = false;
+let isAnimating = false; // Bloquea sobreescrituras de bucle durante acciones
+let actionTimeout = null;
+let cycles = 0;
+let cycleInterval = null;
+let degradationInterval = null;
+
+const BUNNY_STATES = {
+  NORMAL: "(\\_/)\n( •_•)\n/[   ]\\",
+  SAD:    "(\\_/)\n( ☹_☹)\n/[   ]\\",
+  EATING: "(\\_/)\n( ʘ_ʘ) *nom\n/[   ]\\",
+  HAPPY:  "(\\_/)\n( >.<) *~\n/[ ♥ ]\\",
+  DEAD:   "(x_x)\n/| |\\"
+};
+
+const RANDOM_EVENTS = [
+  { msg: "Alerta: Micro-glitch en sector 7. El conejo se asustó.", hunger: 0, boredom: -10, affection: -5, type: 'warn' },
+  { msg: "Spam detectado: Procesos basura ralentizan al conejito.", hunger: -5, boredom: -15, affection: 0, type: 'warn' },
+  { msg: "Fuga de memoria: Se han perdido nutrientes digitales.", hunger: -15, boredom: 0, affection: 0, type: 'danger' },
+  { msg: "Optimización de CPU: El espécimen se siente con energía.", hunger: 0, boredom: 10, affection: 5, type: 'sys' }
+];
+
+const barHunger = document.getElementById('bar-hunger');
+const barBoredom = document.getElementById('bar-boredom');
+const barAffection = document.getElementById('bar-affection');
+const bunnyRender = document.getElementById('bunny-render');
+const consoleLog = document.getElementById('consoleLog');
+const deathOverlay = document.getElementById('death-overlay');
+const statusDot = document.getElementById('statusDot');
+const cycleCountEl = document.getElementById('cycle-count');
+const viewport = document.getElementById('viewport');
+
+function startLoops() {
+  degradationInterval = setInterval(() => {
+    if (isDead) return;
+    stats.hunger = Math.max(0, stats.hunger - 3);
+    stats.boredom = Math.max(0, stats.boredom - 4);
+    stats.affection = Math.max(0, stats.affection - 3);
+    updateUI();
+  }, 2500);
+
+  cycleInterval = setInterval(() => {
+    if (isDead) return;
+    cycles++;
+    cycleCountEl.textContent = cycles;
+
+    if (Math.random() < 0.18 && !isAnimating) {
+      triggerRandomEvent();
+    }
+  }, 4000);
+}
+
+function updateUI() {
+  barHunger.style.width = stats.hunger + '%';
+  barBoredom.style.width = stats.boredom + '%';
+  barAffection.style.width = stats.affection + '%';
+
+  applyColorClass(barHunger, stats.hunger);
+  applyColorClass(barBoredom, stats.boredom);
+  applyColorClass(barAffection, stats.affection);
+
+  if (stats.hunger <= 0 || stats.boredom <= 0 || stats.affection <= 0) {
+    triggerDeath();
+    return;
+  }
+
+  // Si está en medio de una animación interactiva, no sobreescribir el aspecto visual
+  if (isAnimating) return;
+
+  if (stats.hunger < 30 || stats.boredom < 30 || stats.affection < 30) {
+    bunnyRender.textContent = BUNNY_STATES.SAD;
+    bunnyRender.className = "ascii-bunny bunny-shake";
+    consoleLog.innerHTML = `<span class="danger">warning://</span> Constantes críticas. Requiere atención.`;
+    statusDot.style.background = 'var(--yellow)';
+    statusDot.style.boxShadow = '0 0 8px var(--yellow)';
+  } else {
+    bunnyRender.textContent = BUNNY_STATES.NORMAL;
+    bunnyRender.className = "ascii-bunny bunny-idle";
+    statusDot.style.background = 'var(--accent)';
+    statusDot.style.boxShadow = '0 0 8px var(--accent)';
+  }
+}
+
+function applyColorClass(el, val) {
+  if (val <= 25) el.className = 'stat-bar low';
+  else if (val <= 50) el.className = 'stat-bar warning';
+  else el.className = 'stat-bar';
+}
+
+function triggerTemporaryState(asciiState, logMsg, bunnyAnimClass) {
+  if (isDead) return;
+  isAnimating = true;
+  if (actionTimeout) clearTimeout(actionTimeout);
+
+  bunnyRender.textContent = asciiState;
+  bunnyRender.className = `ascii-bunny ${bunnyAnimClass || ''}`;
+  consoleLog.innerHTML = `<span>sys://</span> ${logMsg}`;
+
+  actionTimeout = setTimeout(() => {
+    isAnimating = false;
+    updateUI();
+  }, 1200);
+}
+
+function spawnVisualObject(emoji, cssClass) {
+  const obj = document.createElement('div');
+  obj.className = `anim-object ${cssClass}`;
+  obj.textContent = emoji;
+  viewport.appendChild(obj);
+  
+  setTimeout(() => obj.remove(), 1100);
+}
+
+function spawnHeartsBurst() {
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      if (isDead) return;
+      const heart = document.createElement('div');
+      heart.className = 'particle';
+      heart.textContent = '❤️';
+      heart.style.left = (35 + Math.random() * 30) + '%';
+      viewport.appendChild(heart);
+      setTimeout(() => heart.remove(), 800);
+    }, i * 100);
+  }
+}
+
+function actionFeed() {
+  if (isDead || isAnimating) return;
+  stats.hunger = Math.min(100, stats.hunger + 22);
+  
+  spawnVisualObject('🥕', 'carrot-fall');
+  
+  setTimeout(() => {
+    triggerTemporaryState(BUNNY_STATES.EATING, "Inyectando paquete alimenticio beta-01...", "bunny-bounce");
+  }, 350);
+}
+
+function actionPlay() {
+  if (isDead || isAnimating) return;
+  stats.boredom = Math.min(100, stats.boredom + 25);
+  
+  spawnVisualObject('⚽', 'ball-bounce');
+  
+  setTimeout(() => {
+    triggerTemporaryState(BUNNY_STATES.HAPPY, "Objeto pelota lanzado. Diversión en ejecución.", "bunny-bounce");
+  }, 200);
+}
+
+function actionPet() {
+  if (isDead || isAnimating) return;
+  stats.affection = Math.min(100, stats.affection + 18);
+  
+  spawnVisualObject('🖐️', 'hand-pet');
+  
+  setTimeout(() => {
+    spawnHeartsBurst();
+    triggerTemporaryState(BUNNY_STATES.HAPPY, "Pulso de afecto sincronizado correctamente.", "bunny-bounce");
+  }, 250);
+}
+
+function triggerRandomEvent() {
+  const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  stats.hunger = Math.max(0, Math.min(100, stats.hunger + event.hunger));
+  stats.boredom = Math.max(0, Math.min(100, stats.boredom + event.boredom));
+  stats.affection = Math.max(0, Math.min(100, stats.affection + event.affection));
+  
+  let prefix = 'sys://';
+  if (event.type === 'warn') prefix = '<span class="warn">warn://</span>';
+  if (event.type === 'danger') prefix = '<span class="danger">err://</span>';
+  
+  consoleLog.innerHTML = `${prefix} ${event.msg}`;
+  updateUI();
+}
+
+function triggerDeath() {
+  isDead = true;
+  clearInterval(cycleInterval);
+  clearInterval(degradationInterval);
+  bunnyRender.textContent = BUNNY_STATES.DEAD;
+  bunnyRender.className = "ascii-bunny";
+  consoleLog.innerHTML = `<span class="danger">error://</span> Enlace roto. Conejo fuera de línea.`;
+  statusDot.style.background = 'var(--red)';
+  statusDot.style.boxShadow = '0 0 8px var(--red)';
+  document.getElementById('final-cycles').textContent = cycles;
+  deathOverlay.classList.add('active');
+}
+
+function resetTamagotchi() {
+  stats = { hunger: 100, boredom: 100, affection: 100 };
+  isDead = false;
+  isAnimating = false;
+  cycles = 0;
+  cycleCountEl.textContent = cycles;
+  deathOverlay.classList.remove('active');
+  consoleLog.innerHTML = `<span>sys://</span> Núcleo reiniciado. Reinstalando conejito...`;
+  updateUI();
+  startLoops();
+}
+
+// Inicialización limpia de hilos y renderizado
+bunnyRender.textContent = BUNNY_STATES.NORMAL;
+updateUI();
+startLoops();
+</script>
+</body>
+</html>
