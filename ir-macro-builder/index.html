@@ -1,1 +1,1290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IR Macro Builder // robertts_OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #181c23;
+    --border: #1e2530;
+    --accent: #ff6b00;
+    --accent2: #ff9a40;
+    --green: #39ff14;
+    --dim: #3a4455;
+    --text: #c8d4e8;
+    --text-dim: #5a6a80;
+    --danger: #ff3355;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Grid bg */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,107,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,0,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* HEADER */
+  header {
+    padding: 36px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .logo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .logo-tag {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(255,107,0,0.4);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .header-badge {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 4px 10px;
+    animation: blink 2s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0.3; }
+  }
+
+  /* MAIN LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* SIGNAL LIBRARY */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .sig-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 8px 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .sig-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(255,107,0,0.08);
+    box-shadow: inset 0 0 12px rgba(255,107,0,0.1);
+  }
+
+  .sig-btn:active { transform: scale(0.96); }
+
+  /* CUSTOM SIGNAL FORM */
+  .custom-form {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+
+  select option { background: var(--bg); }
+
+  .btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 9px 16px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .btn-accent:hover {
+    background: var(--accent2);
+    box-shadow: 0 0 20px rgba(255,107,0,0.4);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--dim);
+    color: var(--text-dim);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 9px;
+    padding: 5px 10px;
+  }
+
+  .btn-danger:hover { background: rgba(255,51,85,0.1); }
+
+  .btn-green {
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .btn-green:hover {
+    box-shadow: 0 0 20px rgba(57,255,20,0.4);
+  }
+
+  .btn-full { width: 100%; text-align: center; }
+
+  /* MACRO SEQUENCE */
+  .macro-list {
+    min-height: 120px;
+    margin-bottom: 12px;
+  }
+
+  .macro-empty {
+    border: 1px dashed var(--border);
+    padding: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .macro-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-bottom: 4px;
+    transition: all 0.15s;
+    cursor: grab;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .macro-item:hover { border-color: var(--dim); }
+  .macro-item.dragging { opacity: 0.4; border-color: var(--accent); }
+  .macro-item.drag-over { border-color: var(--accent); background: rgba(255,107,0,0.05); }
+
+  .item-num {
+    font-size: 9px;
+    color: var(--text-dim);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .item-icon {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .item-name {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .item-delay {
+    font-size: 10px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .delay-input {
+    width: 60px;
+    padding: 3px 6px;
+    font-size: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    text-align: right;
+  }
+
+  /* MACRO CONFIG */
+  .macro-config {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .config-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .config-row label {
+    margin: 0;
+    flex-shrink: 0;
+    width: 120px;
+  }
+
+  .config-row input { flex: 1; }
+
+  /* FLIPPER PREVIEW */
+  .flipper-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 16px 0;
+  }
+
+  .flipper-screen {
+    width: 200px;
+    height: 80px;
+    background: #1a2a1a;
+    border: 2px solid #2a4a2a;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--green);
+    padding: 6px 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flipper-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      transparent 50%,
+      rgba(57,255,20,0.03) 50%
+    );
+    background-size: 100% 3px;
+    pointer-events: none;
+  }
+
+  .screen-title {
+    font-size: 8px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(57,255,20,0.2);
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+  }
+
+  .screen-item {
+    font-size: 8px;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .screen-item.selected {
+    background: var(--green);
+    color: #000;
+    padding: 0 2px;
+    opacity: 1;
+  }
+
+  /* OUTPUT TABS */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  .tab {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    cursor: pointer;
+    color: var(--text-dim);
+    background: var(--bg);
+    text-transform: uppercase;
+    transition: all 0.15s;
+    margin-right: -1px;
+  }
+
+  .tab.active {
+    background: var(--surface);
+    color: var(--accent);
+    border-color: var(--accent);
+    border-bottom-color: var(--surface);
+    z-index: 1;
+  }
+
+  .tab-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px;
+    display: none;
+    position: relative;
+  }
+
+  .tab-content.active { display: block; }
+
+  pre {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: #7eb8a0;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.6;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  pre .comment { color: var(--text-dim); }
+  pre .keyword { color: var(--accent); }
+  pre .string { color: var(--green); }
+  pre .num { color: #7eb8f0; }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 5px 10px;
+    background: transparent;
+    border: 1px solid var(--dim);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* INSTRUCTION STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .step-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green);
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 10px 24px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* DRAG HANDLE */
+  .drag-handle {
+    color: var(--dim);
+    cursor: grab;
+    font-size: 12px;
+    padding: 0 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--dim); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .signal-grid { grid-template-columns: repeat(3, 1fr); }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo-block">
+      <span class="logo-tag">// Flipper Zero</span>
+      <h1>IR <span>MACRO</span> BUILDER</h1>
+    </div>
+    <div class="header-badge">● SYSTEM READY</div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- SIGNAL LIBRARY -->
+      <div class="panel">
+        <div class="panel-title">Biblioteca de señales</div>
+
+        <div id="categoryTabs" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="tab active" onclick="showCat('nav')" id="cat-nav">Navegación</button>
+          <button class="tab active" onclick="showCat('media')" id="cat-media" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">Media</button>
+          <button class="tab active" onclick="showCat('power')" id="cat-power" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">Power</button>
+          <button class="tab active" onclick="showCat('num')" id="cat-num" style="background:var(--bg);color:var(--text-dim);border-bottom:1px solid var(--border);">Números</button>
+        </div>
+
+        <div id="sig-nav" class="signal-grid"></div>
+        <div id="sig-media" class="signal-grid" style="display:none"></div>
+        <div id="sig-power" class="signal-grid" style="display:none"></div>
+        <div id="sig-num" class="signal-grid" style="display:none"></div>
+
+        <div class="divider"></div>
+
+        <!-- CUSTOM SIGNAL -->
+        <div class="panel-title" style="font-size:10px;">Señal personalizada</div>
+        <div class="custom-form">
+          <div class="form-row">
+            <div>
+              <label>Nombre</label>
+              <input type="text" id="cName" placeholder="Mi_Señal" />
+            </div>
+            <div>
+              <label>Protocolo</label>
+              <select id="cProto">
+                <option>NEC</option>
+                <option>NECext</option>
+                <option>Samsung32</option>
+                <option>RC6</option>
+                <option>RC5</option>
+                <option>SIRC</option>
+                <option>SIRC15</option>
+                <option>SIRC20</option>
+                <option>RCA</option>
+                <option>Raw</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row three">
+            <div>
+              <label>Address (hex)</label>
+              <input type="text" id="cAddr" placeholder="0x00" />
+            </div>
+            <div>
+              <label>Command (hex)</label>
+              <input type="text" id="cCmd" placeholder="0x00" />
+            </div>
+            <div>
+              <label>Delay (ms)</label>
+              <input type="number" id="cDelay" value="200" min="0" max="9999" />
+            </div>
+          </div>
+          <button class="btn btn-outline btn-full" onclick="addCustom()">+ Añadir señal personalizada</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <!-- MACRO CONFIG -->
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-title">Configuración del macro</div>
+        <div class="macro-config">
+          <div class="config-row">
+            <label>Nombre botón</label>
+            <input type="text" id="macroName" value="My_Macro" maxlength="32" />
+          </div>
+          <div class="config-row">
+            <label>Delay global (ms)</label>
+            <input type="number" id="globalDelay" value="200" min="0" max="9999" />
+          </div>
+          <div class="config-row">
+            <label>Repeticiones</label>
+            <input type="number" id="repeatCount" value="1" min="1" max="10" />
+          </div>
+        </div>
+
+        <!-- FLIPPER PREVIEW -->
+        <div class="flipper-preview">
+          <div class="flipper-screen" id="flipperScreen">
+            <div class="screen-title">IR REMOTE ▸ MY_MACRO</div>
+            <div id="screenItems"></div>
+          </div>
+          <span style="font-size:9px;color:var(--text-dim);letter-spacing:2px;">PREVIEW</span>
+        </div>
+      </div>
+
+      <!-- MACRO SEQUENCE -->
+      <div class="panel">
+        <div class="panel-title">
+          Secuencia del macro
+          <span style="margin-left:auto;font-size:9px;color:var(--text-dim);" id="itemCount">0 señales</span>
+        </div>
+
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-val" id="statCount">0</span>
+            <span class="stat-label">Señales</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val" id="statTime">0ms</span>
+            <span class="stat-label">Tiempo total</span>
+          </div>
+          <div class="stat">
+            <span class="stat-val" id="statSize">0B</span>
+            <span class="stat-label">Tamaño .ir</span>
+          </div>
+        </div>
+
+        <div class="macro-list" id="macroList">
+          <div class="macro-empty" id="emptyMsg">
+            // Pulsa señales de la biblioteca<br>para añadirlas a la secuencia
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline" onclick="clearMacro()" style="flex:1;">✕ Limpiar</button>
+          <button class="btn btn-outline" onclick="duplicateLast()" style="flex:1;">⧉ Duplicar último</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- EXPORT TABS -->
+        <div class="tab-bar">
+          <div class="tab active" onclick="switchTab('ir')">archivo .ir</div>
+          <div class="tab" onclick="switchTab('c')">código C</div>
+          <div class="tab" onclick="switchTab('guide')">guía</div>
+        </div>
+
+        <div class="tab-content active" id="tab-ir">
+          <button class="copy-btn" onclick="copyCode('ir')">COPIAR</button>
+          <pre id="code-ir">// Añade señales para ver el archivo .ir</pre>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-accent" style="flex:1;" onclick="downloadFile('ir')">⬇ Descargar .ir</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-c">
+          <button class="copy-btn" onclick="copyCode('c')">COPIAR</button>
+          <pre id="code-c">// Añade señales para generar el código C</pre>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-accent" style="flex:1;" onclick="downloadFile('c')">⬇ Descargar .c</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-guide">
+          <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.7;">
+            <div style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:10px;">CÓMO USAR EL ARCHIVO .IR</div>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><span>Descarga el archivo <b style="color:var(--text);">.ir</b> generado</span></div>
+              <div class="step"><div class="step-num">2</div><span>Cópialo a la SD del Flipper en: <b style="color:var(--green);">SD/infrared/</b></span></div>
+              <div class="step"><div class="step-num">3</div><span>En Flipper: <b style="color:var(--text);">Infrared → Open file</b> → selecciona tu archivo</span></div>
+              <div class="step"><div class="step-num">4</div><span>Aparecerá tu botón macro. Pulsarlo envía toda la secuencia automáticamente</span></div>
+            </div>
+            <div class="divider"></div>
+            <div style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:10px;">CÓMO USAR EL CÓDIGO C</div>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><span>Requiere <b style="color:var(--text);">Flipper Zero Firmware SDK</b></span></div>
+              <div class="step"><div class="step-num">2</div><span>Crea una carpeta en <b style="color:var(--green);">applications_user/ir_macro/</b></span></div>
+              <div class="step"><div class="step-num">3</div><span>Guarda el .c y crea un <b style="color:var(--text);">application.fam</b> con appid y entry_point</span></div>
+              <div class="step"><div class="step-num">4</div><span>Compila con <b style="color:var(--green);">./fbt launch_app APPSRC=applications_user/ir_macro</b></span></div>
+            </div>
+            <div class="divider"></div>
+            <div style="color:var(--text-dim);font-size:9px;line-height:1.8;">
+              ⚠ El .ir es el método más simple y no requiere compilación.<br>
+              El código C crea una app nativa que aparece en el menú del Flipper.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== SIGNAL DATABASE =====
+const SIGNALS = {
+  nav: [
+    { name: 'Up', icon: '↑', address: '0x00', command: '0x0C', protocol: 'NEC' },
+    { name: 'Down', icon: '↓', address: '0x00', command: '0x0D', protocol: 'NEC' },
+    { name: 'Left', icon: '←', address: '0x00', command: '0x0E', protocol: 'NEC' },
+    { name: 'Right', icon: '→', address: '0x00', command: '0x0F', protocol: 'NEC' },
+    { name: 'OK', icon: '✓', address: '0x00', command: '0x0B', protocol: 'NEC' },
+    { name: 'Back', icon: '⬅', address: '0x00', command: '0x28', protocol: 'NEC' },
+    { name: 'Menu', icon: '☰', address: '0x00', command: '0x40', protocol: 'NEC' },
+    { name: 'Home', icon: '⌂', address: '0x00', command: '0x09', protocol: 'NEC' },
+    { name: 'Source', icon: '⊙', address: '0x00', command: '0x02', protocol: 'NEC' },
+    { name: 'Options', icon: '⚙', address: '0x00', command: '0x4A', protocol: 'NEC' },
+    { name: 'Info', icon: 'ℹ', address: '0x00', command: '0x0A', protocol: 'NEC' },
+    { name: 'Guide', icon: '📋', address: '0x00', command: '0x4C', protocol: 'NEC' },
+  ],
+  media: [
+    { name: 'Play', icon: '▶', address: '0x00', command: '0x30', protocol: 'NEC' },
+    { name: 'Pause', icon: '⏸', address: '0x00', command: '0x31', protocol: 'NEC' },
+    { name: 'Stop', icon: '⏹', address: '0x00', command: '0x32', protocol: 'NEC' },
+    { name: 'Prev', icon: '⏮', address: '0x00', command: '0x33', protocol: 'NEC' },
+    { name: 'Next', icon: '⏭', address: '0x00', command: '0x34', protocol: 'NEC' },
+    { name: 'Vol+', icon: '🔊', address: '0x00', command: '0x10', protocol: 'NEC' },
+    { name: 'Vol-', icon: '🔉', address: '0x00', command: '0x11', protocol: 'NEC' },
+    { name: 'Mute', icon: '🔇', address: '0x00', command: '0x0F', protocol: 'NEC' },
+    { name: 'Ch+', icon: '🔼', address: '0x00', command: '0x1E', protocol: 'NEC' },
+    { name: 'Ch-', icon: '🔽', address: '0x00', command: '0x1F', protocol: 'NEC' },
+    { name: 'Rec', icon: '⏺', address: '0x00', command: '0x37', protocol: 'NEC' },
+    { name: 'Sub', icon: '💬', address: '0x00', command: '0x4F', protocol: 'NEC' },
+  ],
+  power: [
+    { name: 'Power', icon: '⏻', address: '0x00', command: '0x08', protocol: 'NEC' },
+    { name: 'Sleep', icon: '😴', address: '0x00', command: '0x3B', protocol: 'NEC' },
+    { name: 'Wake', icon: '☀', address: '0x00', command: '0x3C', protocol: 'NEC' },
+    { name: 'Standby', icon: '⏼', address: '0x00', command: '0x1A', protocol: 'NEC' },
+  ],
+  num: [
+    { name: '0', icon: '0', address: '0x00', command: '0x00', protocol: 'NEC' },
+    { name: '1', icon: '1', address: '0x00', command: '0x01', protocol: 'NEC' },
+    { name: '2', icon: '2', address: '0x00', command: '0x02', protocol: 'NEC' },
+    { name: '3', icon: '3', address: '0x00', command: '0x03', protocol: 'NEC' },
+    { name: '4', icon: '4', address: '0x00', command: '0x04', protocol: 'NEC' },
+    { name: '5', icon: '5', address: '0x00', command: '0x05', protocol: 'NEC' },
+    { name: '6', icon: '6', address: '0x00', command: '0x06', protocol: 'NEC' },
+    { name: '7', icon: '7', address: '0x00', command: '0x07', protocol: 'NEC' },
+    { name: '8', icon: '8', address: '0x00', command: '0x08', protocol: 'NEC' },
+    { name: '9', icon: '9', address: '0x00', command: '0x09', protocol: 'NEC' },
+  ]
+};
+
+// ===== STATE =====
+let macro = [];
+let dragSrcIdx = null;
+
+// ===== INIT =====
+function init() {
+  Object.entries(SIGNALS).forEach(([cat, sigs]) => {
+    const grid = document.getElementById('sig-' + cat);
+    sigs.forEach(sig => {
+      const btn = document.createElement('button');
+      btn.className = 'sig-btn';
+      btn.innerHTML = `<div style="font-size:16px;margin-bottom:2px;">${sig.icon}</div>${sig.name}`;
+      btn.onclick = () => addSignal({ ...sig, delay: parseInt(document.getElementById('globalDelay').value) || 200 });
+      grid.appendChild(btn);
+    });
+  });
+}
+
+// ===== CATEGORY TABS =====
+function showCat(cat) {
+  ['nav','media','power','num'].forEach(c => {
+    document.getElementById('sig-'+c).style.display = c === cat ? 'grid' : 'none';
+  });
+}
+
+// ===== ADD SIGNAL =====
+function addSignal(sig) {
+  macro.push({ ...sig, id: Date.now() + Math.random() });
+  render();
+  showToast('+ ' + sig.name + ' añadido');
+}
+
+function addCustom() {
+  const name = document.getElementById('cName').value.trim() || 'Custom';
+  const proto = document.getElementById('cProto').value;
+  const addr = document.getElementById('cAddr').value.trim() || '0x00';
+  const cmd = document.getElementById('cCmd').value.trim() || '0x00';
+  const delay = parseInt(document.getElementById('cDelay').value) || 200;
+  addSignal({ name, protocol: proto, address: addr, command: cmd, icon: '⚡', delay });
+}
+
+function clearMacro() {
+  macro = [];
+  render();
+}
+
+function duplicateLast() {
+  if (!macro.length) return;
+  const last = { ...macro[macro.length - 1], id: Date.now() + Math.random() };
+  macro.push(last);
+  render();
+}
+
+function removeItem(idx) {
+  macro.splice(idx, 1);
+  render();
+}
+
+// ===== RENDER =====
+function render() {
+  const list = document.getElementById('macroList');
+  const empty = document.getElementById('emptyMsg');
+
+  if (!macro.length) {
+    list.innerHTML = '';
+    list.appendChild(empty.cloneNode(true));
+    document.getElementById('emptyMsg').style.display = 'block';
+  } else {
+    list.innerHTML = '';
+    macro.forEach((item, i) => {
+      const el = document.createElement('div');
+      el.className = 'macro-item';
+      el.draggable = true;
+      el.dataset.idx = i;
+      el.innerHTML = `
+        <span class="drag-handle">⠿</span>
+        <span class="item-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="item-icon">${item.icon || '▸'}</span>
+        <span class="item-name">${item.name}</span>
+        <input class="delay-input" type="number" value="${item.delay}" min="0" max="9999"
+          oninput="macro[${i}].delay=parseInt(this.value)||0;updateStats();generateCode();"
+          title="Delay en ms" />
+        <span style="font-size:9px;color:var(--text-dim);">ms</span>
+        <button class="btn btn-danger" onclick="removeItem(${i})">✕</button>
+      `;
+      el.addEventListener('dragstart', e => { dragSrcIdx = i; el.classList.add('dragging'); });
+      el.addEventListener('dragend', e => { el.classList.remove('dragging'); document.querySelectorAll('.macro-item').forEach(x=>x.classList.remove('drag-over')); });
+      el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+      el.addEventListener('dragleave', e => el.classList.remove('drag-over'));
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrcIdx !== null && dragSrcIdx !== i) {
+          const moved = macro.splice(dragSrcIdx, 1)[0];
+          macro.splice(i, 0, moved);
+          render();
+        }
+      });
+      list.appendChild(el);
+    });
+  }
+
+  updateStats();
+  updatePreview();
+  generateCode();
+}
+
+// ===== STATS =====
+function updateStats() {
+  const count = macro.length;
+  const time = macro.reduce((s, x) => s + (x.delay || 0), 0);
+  const irSize = generateIR().length;
+  document.getElementById('statCount').textContent = count;
+  document.getElementById('statTime').textContent = time >= 1000 ? (time/1000).toFixed(1)+'s' : time+'ms';
+  document.getElementById('statSize').textContent = irSize < 1024 ? irSize+'B' : (irSize/1024).toFixed(1)+'KB';
+  document.getElementById('itemCount').textContent = count + ' señal' + (count!==1?'es':'');
+}
+
+// ===== FLIPPER PREVIEW =====
+function updatePreview() {
+  const name = document.getElementById('macroName').value || 'MY_MACRO';
+  const title = document.querySelector('.screen-title');
+  if (title) title.textContent = 'IR REMOTE ▸ ' + name.toUpperCase();
+  const items = document.getElementById('screenItems');
+  items.innerHTML = '';
+  const shown = macro.slice(0, 5);
+  shown.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.className = 'screen-item' + (i===0?' selected':'');
+    d.textContent = `▸ ${item.name.toUpperCase()} (${item.delay}ms)`;
+    items.appendChild(d);
+  });
+  if (macro.length > 5) {
+    const d = document.createElement('div');
+    d.className = 'screen-item';
+    d.textContent = `  ...+${macro.length-5} más`;
+    items.appendChild(d);
+  }
+}
+
+// ===== GENERATE .IR =====
+function generateIR() {
+  const name = (document.getElementById('macroName').value || 'My_Macro').replace(/\s/g,'_');
+  const repeats = parseInt(document.getElementById('repeatCount').value) || 1;
+
+  let lines = ['Filetype: IR signals file', 'Version: 1', '#'];
+  lines.push(`# Macro: ${name}`);
+  lines.push(`# Generado por Flipper IR Macro Builder`);
+  lines.push(`# Señales: ${macro.length} | Repeticiones: ${repeats}`);
+  lines.push('#');
+  lines.push('');
+
+  // Individual signals (for reference)
+  macro.forEach((item, i) => {
+    lines.push(`name: ${name}_${String(i+1).padStart(2,'0')}_${item.name.replace(/\s/g,'_')}`);
+    lines.push(`type: parsed`);
+    lines.push(`protocol: ${item.protocol || 'NEC'}`);
+    lines.push(`address: ${item.address || '0x00'} 00 00 00`);
+    lines.push(`command: ${item.command || '0x00'} 00 00 00`);
+    lines.push('');
+  });
+
+  return lines.join('\n');
+}
+
+// ===== GENERATE C CODE =====
+function generateC() {
+  const name = (document.getElementById('macroName').value || 'My_Macro').replace(/\s/g,'_');
+  const repeats = parseInt(document.getElementById('repeatCount').value) || 1;
+
+  const sigStructs = macro.map((item, i) => {
+    const proto = item.protocol || 'NEC';
+    const addr = parseInt(item.address) || 0;
+    const cmd = parseInt(item.command) || 0;
+    const delay = item.delay || 200;
+    return `    { "${item.name}", InfraredProtocol${proto}, 0x${addr.toString(16).toUpperCase().padStart(2,'0')}, 0x${cmd.toString(16).toUpperCase().padStart(2,'0')}, ${delay} }`;
+  }).join(',\n');
+
+  return `/**
+ * IR Macro: ${name}
+ * Generado por Flipper IR Macro Builder
+ * Señales: ${macro.length} | Repeticiones: ${repeats}
+ *
+ * INSTALACIÓN:
+ *   1. Copia este archivo a applications_user/ir_macro/ir_macro.c
+ *   2. Crea application.fam con appid="ir_macro", entry_point="ir_macro_app"
+ *   3. Compila: ./fbt launch_app APPSRC=applications_user/ir_macro
+ */
+
+#include <furi.h>
+#include <furi_hal.h>
+#include <furi_hal_infrared.h>
+#include <gui/gui.h>
+#include <input/input.h>
+#include <infrared.h>
+#include <infrared_worker.h>
+#include <notification/notification_messages.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TAG "IrMacro"
+#define MACRO_NAME "${name}"
+#define MACRO_REPEATS ${repeats}
+
+typedef struct {
+    const char*      name;
+    InfraredProtocol protocol;
+    uint32_t         address;
+    uint32_t         command;
+    uint32_t         delay_ms;
+} IrSignal;
+
+/* ── Secuencia de señales ─────────────────────────────── */
+static const IrSignal macro_signals[] = {
+${sigStructs}
+};
+
+static const size_t SIGNAL_COUNT = sizeof(macro_signals) / sizeof(macro_signals[0]);
+
+/* ── Estado de la app ────────────────────────────────── */
+typedef enum { STATE_IDLE, STATE_RUNNING, STATE_DONE } AppState;
+
+typedef struct {
+    AppState         state;
+    size_t           current_signal;
+    FuriMessageQueue* queue;
+    ViewPort*        viewport;
+    Gui*             gui;
+    NotificationApp* notifications;
+} IrMacroApp;
+
+/* ── Envío de señal IR ───────────────────────────────── */
+static void send_signal(const IrSignal* sig) {
+    InfraredMessage msg = {
+        .protocol = sig->protocol,
+        .address  = sig->address,
+        .command  = sig->command,
+        .repeat   = false,
+    };
+
+    furi_hal_infrared_async_tx_set_data_isr_callback(NULL, NULL);
+    InfraredEncoderHandler* handler = infrared_alloc_encoder();
+    infrared_encode(handler, &msg);
+
+    FURI_LOG_I(TAG, "Sending: %s (proto=%d addr=0x%02X cmd=0x%02X)",
+               sig->name, sig->protocol, sig->address, sig->command);
+
+    infrared_free_encoder(handler);
+    furi_hal_infrared_async_tx_start(sig->address, sig->command, sig->protocol);
+    furi_delay_ms(sig->delay_ms);
+}
+
+/* ── Ejecutar macro completo ─────────────────────────── */
+static void run_macro(IrMacroApp* app) {
+    app->state = STATE_RUNNING;
+    FURI_LOG_I(TAG, "Macro [%s] start — %zu signals x%d", MACRO_NAME, SIGNAL_COUNT, MACRO_REPEATS);
+
+    for(int r = 0; r < MACRO_REPEATS; r++) {
+        for(size_t i = 0; i < SIGNAL_COUNT; i++) {
+            app->current_signal = i;
+            view_port_update(app->viewport);
+            send_signal(&macro_signals[i]);
+        }
+    }
+
+    app->state = STATE_DONE;
+    app->current_signal = 0;
+    FURI_LOG_I(TAG, "Macro done");
+
+    notification_message(app->notifications, &sequence_success);
+}
+
+/* ── Render ──────────────────────────────────────────── */
+static void render_cb(Canvas* canvas, void* ctx) {
+    IrMacroApp* app = ctx;
+
+    canvas_clear(canvas);
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str(canvas, 2, 10, "IR MACRO");
+
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 2, 22, MACRO_NAME);
+
+    char buf[48];
+
+    if(app->state == STATE_IDLE) {
+        canvas_draw_str(canvas, 2, 36, "Pulsa OK para ejecutar");
+        snprintf(buf, sizeof(buf), "%zu señales | x%d", SIGNAL_COUNT, MACRO_REPEATS);
+        canvas_draw_str(canvas, 2, 48, buf);
+    } else if(app->state == STATE_RUNNING) {
+        snprintf(buf, sizeof(buf), "[%zu/%zu] %s",
+                 app->current_signal + 1,
+                 SIGNAL_COUNT,
+                 macro_signals[app->current_signal].name);
+        canvas_draw_str(canvas, 2, 36, "Enviando...");
+        canvas_draw_str(canvas, 2, 48, buf);
+
+        /* Barra de progreso */
+        int progress = (int)((app->current_signal + 1) * 120 / SIGNAL_COUNT);
+        canvas_draw_frame(canvas, 2, 54, 122, 7);
+        canvas_draw_box(canvas, 3, 55, progress, 5);
+    } else {
+        canvas_draw_str(canvas, 2, 36, "¡Macro completado!");
+        canvas_draw_str(canvas, 2, 48, "Pulsa OK para repetir");
+    }
+}
+
+/* ── Input callback ──────────────────────────────────── */
+static void input_cb(InputEvent* event, void* ctx) {
+    FuriMessageQueue* queue = ctx;
+    furi_message_queue_put(queue, event, FuriWaitForever);
+}
+
+/* ── Entry point ─────────────────────────────────────── */
+int32_t ir_macro_app(void* p) {
+    UNUSED(p);
+
+    IrMacroApp* app = malloc(sizeof(IrMacroApp));
+    app->state          = STATE_IDLE;
+    app->current_signal = 0;
+    app->queue          = furi_message_queue_alloc(8, sizeof(InputEvent));
+    app->notifications  = furi_record_open(RECORD_NOTIFICATION);
+    app->viewport       = view_port_alloc();
+    app->gui            = furi_record_open(RECORD_GUI);
+
+    view_port_draw_callback_set(app->viewport, render_cb, app);
+    view_port_input_callback_set(app->viewport, input_cb, app->queue);
+    gui_add_view_port(app->gui, app->viewport, GuiLayerFullscreen);
+
+    InputEvent event;
+    bool running = true;
+
+    while(running) {
+        if(furi_message_queue_get(app->queue, &event, 100) == FuriStatusOk) {
+            if(event.type == InputTypeShort) {
+                if(event.key == InputKeyOk) {
+                    if(app->state != STATE_RUNNING) {
+                        run_macro(app);
+                    }
+                } else if(event.key == InputKeyBack) {
+                    if(app->state != STATE_RUNNING) running = false;
+                }
+            }
+        }
+        view_port_update(app->viewport);
+    }
+
+    gui_remove_view_port(app->gui, app->viewport);
+    view_port_free(app->viewport);
+    furi_message_queue_free(app->queue);
+    furi_record_close(RECORD_GUI);
+    furi_record_close(RECORD_NOTIFICATION);
+    free(app);
+
+    return 0;
+}
+`;
+}
+
+// ===== UPDATE CODE PANELS =====
+function generateCode() {
+  document.getElementById('code-ir').textContent = macro.length ? generateIR() : '// Añade señales para ver el archivo .ir';
+  document.getElementById('code-c').textContent = macro.length ? generateC() : '// Añade señales para generar el código C';
+}
+
+// ===== TABS =====
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['ir','c','guide'][i] === id);
+  });
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ===== COPY =====
+function copyCode(type) {
+  const text = document.getElementById('code-'+type).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ COPIADO';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPIAR'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ===== DOWNLOAD =====
+function downloadFile(type) {
+  const name = (document.getElementById('macroName').value || 'My_Macro').replace(/\s/g,'_');
+  let content, filename, mime;
+  if (type === 'ir') {
+    content = generateIR();
+    filename = name + '.ir';
+    mime = 'text/plain';
+  } else {
+    content = generateC();
+    filename = 'ir_macro.c';
+    mime = 'text/x-csrc';
+  }
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  showToast('Descargando ' + filename);
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Live updates
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  document.getElementById('macroName').addEventListener('input', () => { updatePreview(); generateCode(); });
+  document.getElementById('globalDelay').addEventListener('input', generateCode);
+  document.getElementById('repeatCount').addEventListener('input', generateCode);
+});
+</script>
+</body>
+</html>
