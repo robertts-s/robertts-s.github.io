@@ -445,7 +445,7 @@ body::before{
       <span class="lbl">links.txt</span>
     </div>
     <!-- flipper -->
-    <div class="d-icon" onclick="openWin('win-flipper')">
+    <div class="d-icon" onclick="window.open('https://robertts-s.github.io/ir-macro-builder/','_blank')">
       <div class="ic-box">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="5" y="3" width="14" height="18" rx="2"/>
@@ -507,7 +507,7 @@ body::before{
   <div class="smenu-item" onclick="openWin('win-social');closeMenu()">
     <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.5 10.5l7-4M8.5 13.5l7 4"/></svg>links.txt
   </div>
-  <div class="smenu-item" onclick="openWin('win-flipper');closeMenu()">
+  <div class="smenu-item" onclick="window.open('https://robertts-s.github.io/ir-macro-builder/','_blank');closeMenu()">
     <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="5" rx="1"/><circle cx="9" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>flipper_ir.app
   </div>
   <div class="smenu-item" onclick="openWin('win-terminal');closeMenu()">
@@ -733,30 +733,6 @@ body::before{
   <div class="resize-handle rh-se" onmousedown="startResize(event,'win-terminal','se')"></div>
 </div>
 
-<!-- FLIPPER IR MACRO BUILDER WINDOW -->
-<div class="window" id="win-flipper">
-  <div class="titlebar" onmousedown="startDrag(event,'win-flipper')">
-    <div class="win-dots">
-      <div class="dot close" onclick="closeWin('win-flipper')"></div>
-      <div class="dot min" onclick="maximizeWin('win-flipper')"></div>
-      <div class="dot max" onclick="minimizeWin('win-flipper')"></div>
-    </div>
-    <div class="win-title">flipper_ir_macro_builder.app</div>
-    <div style="width:42px"></div>
-  </div>
-  <div class="win-body" style="overflow:hidden">
-    <iframe class="flipper-iframe" id="flipperFrame" src="https://robertts-s.github.io/ir-macro-builder/" title="Flipper IR Macro Builder" allow="same-origin"></iframe>
-  </div>
-  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-flipper','n')"></div>
-  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-flipper','s')"></div>
-  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-flipper','w')"></div>
-  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-flipper','e')"></div>
-  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-flipper','nw')"></div>
-  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-flipper','ne')"></div>
-  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-flipper','sw')"></div>
-  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-flipper','se')"></div>
-</div>
-
 <!-- PET WINDOW -->
 <div class="window" id="win-pet">
   <div class="titlebar" onmousedown="startDrag(event,'win-pet')">
@@ -769,7 +745,613 @@ body::before{
     <div style="width:42px"></div>
   </div>
   <div class="win-body" style="overflow:hidden">
-    <iframe id="petFrame" src="https://robertts-s.github.io/pet/" style="width:100%;height:560px;border:none;display:block;background:#07080b" title="My Pet"></iframe>
+    <iframe id="petFrame" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no&quot;/&gt;
+&lt;title&gt;bunnY_sys // tamagotchi v2.9&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;family=Orbitron:wght=400;700;900&amp;display=swap&quot; rel=&quot;stylesheet&quot;/&gt;
+&lt;style&gt;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #07080b;
+  --surface: #0d0f14;
+  --surface2: #111420;
+  --border: #1c2030;
+  --border2: #252a3a;
+  --accent: #00ff9d;
+  --accent-dim: #00cc7a;
+  --accent-glow: rgba(0, 255, 157, 0.15);
+  --red: #ff3355;
+  --yellow: #f0c040;
+  --text: #b8c8d8;
+  --muted: #3a4a5a;
+  --muted2: #556070;
+  --font: 'Share Tech Mono', monospace;
+  --font-head: 'Orbitron', sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, 0.06) 3px, rgba(0, 0, 0, 0.06) 4px);
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.tama-container {
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 30px rgba(0, 255, 157, 0.06), 0 20px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.tama-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+  user-select: none;
+}
+
+.tama-title {
+  font-family: var(--font-head);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.score-panel {
+  font-size: 0.65rem;
+  color: var(--muted2);
+}
+.score-panel span { color: var(--text); }
+
+.tama-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: blink 2s step-end infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.tama-screen {
+  padding: 16px;
+  background: #050608;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+}
+
+.stat-label {
+  color: var(--muted2);
+}
+
+.stat-bar-container {
+  width: 180px;
+  height: 6px;
+  background: var(--border);
+  border: 1px solid var(--border2);
+  position: relative;
+}
+
+.stat-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.stat-bar.low {
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+}
+
+.stat-bar.warning {
+  background: var(--yellow);
+}
+
+/* VIEWPORT OPTIMIZADO */
+.viewport {
+  height: 140px;
+  border: 1px dashed var(--border2);
+  background: rgba(0, 255, 157, 0.01);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.viewport:hover {
+  background: rgba(0, 255, 157, 0.03);
+}
+
+.ascii-bunny {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  font-family: monospace;
+  white-space: pre;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+/* Animación estática por defecto */
+.bunny-idle {
+  animation: idle-breathing 2.5s ease-in-out infinite;
+}
+
+@keyframes idle-breathing {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(0.93) scaleX(1.04) translateY(1px); }
+}
+
+/* Animaciones reactivas forzadas */
+.bunny-bounce {
+  animation: jump-bounce 0.5s cubic-bezier(0.25, 1, 0.5, 1) 1 !important;
+}
+@keyframes jump-bounce {
+  0%, 100% { transform: scale(1) translateY(0); }
+  40% { transform: scale(0.85, 1.2) translateY(-22px); }
+  75% { transform: scale(1.15, 0.85) translateY(0); }
+}
+
+.bunny-shake {
+  animation: fast-shake 0.25s ease-in-out infinite !important;
+}
+@keyframes fast-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* --- OBJETOS FLOTANTES (EMOJIS) --- */
+.anim-object {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Zanahoria cayendo en su boca */
+.carrot-fall {
+  animation: carrot-anim 0.8s ease-in forwards;
+}
+@keyframes carrot-anim {
+  0% { top: -40px; opacity: 0; transform: translateX(-50%) scale(0.6); }
+  30% { opacity: 1; }
+  70% { top: 40px; transform: translateX(-50%) rotate(25deg) scale(1.1); opacity: 1; }
+  100% { top: 65px; transform: translateX(-50%) scale(0); opacity: 0; }
+}
+
+/* Pelota rebotando */
+.ball-bounce {
+  animation: ball-anim 1s ease-in-out forwards;
+}
+@keyframes ball-anim {
+  0% { left: 10%; top: 20px; transform: rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  50% { left: 50%; top: 65px; transform: rotate(180deg); }
+  75% { left: 75%; top: 25px; transform: rotate(270deg); opacity: 1; }
+  100% { left: 95%; top: 75px; transform: rotate(360deg); opacity: 0; }
+}
+
+/* Mano haciendo mimos */
+.hand-pet {
+  animation: hand-anim 1s ease-in-out forwards;
+}
+@keyframes hand-anim {
+  0% { top: -40px; opacity: 0; }
+  30%, 70% { top: 10px; transform: translateX(-50%) rotate(-15deg); opacity: 1; }
+  50% { top: 8px; transform: translateX(-50%) rotate(15deg); opacity: 1; }
+  100% { top: -40px; opacity: 0; }
+}
+
+/* Corazones flotantes */
+.particle {
+  position: absolute;
+  font-size: 1.2rem;
+  pointer-events: none;
+  animation: float-up 0.8s ease-out forwards;
+  z-index: 6;
+}
+@keyframes float-up {
+  0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(10px) scale(1.5); opacity: 0; }
+}
+
+.console-log {
+  font-size: 0.62rem;
+  color: var(--muted2);
+  height: 32px;
+  line-height: 32px;
+  padding: 0 8px;
+  background: #030406;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console-log span { color: var(--accent); }
+.console-log span.warn { color: var(--yellow); }
+.console-log span.danger { color: var(--red); }
+
+.controls-panel {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: var(--surface);
+}
+
+.btn-action {
+  font-family: var(--font);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.btn-action:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0, 255, 157, 0.05);
+}
+
+.btn-action:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 8, 11, 0.96);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 10;
+}
+
+.overlay.active {
+  display: flex !important;
+}
+
+.overlay-title {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  color: var(--red);
+  letter-spacing: 2px;
+  animation: glitch-text 1s linear infinite;
+}
+
+@keyframes glitch-text {
+  0%, 100% { text-shadow: 2px 0 0 rgba(255,0,0,0.5), -2px 0 0 rgba(0,255,255,0.5); }
+  50% { text-shadow: -2px 0 0 rgba(255,0,0,0.5), 2px 0 0 rgba(0,255,255,0.5); }
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;tama-container&quot;&gt;
+  &lt;div class=&quot;tama-header&quot;&gt;
+    &lt;div class=&quot;tama-title&quot;&gt;BUNNY_CORE_v2.9&lt;/div&gt;
+    &lt;div class=&quot;score-panel&quot;&gt;CICLOS: &lt;span id=&quot;cycle-count&quot;&gt;0&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;tama-status-dot&quot; id=&quot;statusDot&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;tama-screen&quot;&gt;
+    &lt;div class=&quot;stats-panel&quot;&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;ALIMENTACIÓN //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-hunger&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;ENTRETENIMIENTO //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-boredom&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;stat-row&quot;&gt;
+        &lt;span class=&quot;stat-label&quot;&gt;AFECTO //&lt;/span&gt;
+        &lt;div class=&quot;stat-bar-container&quot;&gt;
+          &lt;div class=&quot;stat-bar&quot; id=&quot;bar-affection&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;viewport&quot; id=&quot;viewport&quot; onclick=&quot;actionPet()&quot;&gt;
+      &lt;div class=&quot;ascii-bunny bunny-idle&quot; id=&quot;bunny-render&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;console-log&quot; id=&quot;consoleLog&quot;&gt;sys:// conejito.sh inicializado.&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;controls-panel&quot;&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionFeed()&quot;&gt;Alimentar&lt;/button&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionPlay()&quot;&gt;Jugar&lt;/button&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;actionPet()&quot;&gt;Acariciar&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;overlay&quot; id=&quot;death-overlay&quot;&gt;
+    &lt;div class=&quot;overlay-title&quot;&gt;SYSTEM FAILURE&lt;/div&gt;
+    &lt;div style=&quot;font-size:0.65rem; color:var(--muted2); text-align:center; line-height:1.6;&quot;&gt;
+      El espécimen digital ha expirado.&lt;br&gt;Ciclos totales sobrevividos: &lt;span id=&quot;final-cycles&quot; style=&quot;color:var(--text)&quot;&gt;0&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;btn-action&quot; onclick=&quot;resetTamagotchi()&quot; style=&quot;width:120px; margin-top:8px;&quot;&gt;Reiniciar&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+let stats = { hunger: 100, boredom: 100, affection: 100 };
+let isDead = false;
+let isAnimating = false; // Bloquea sobreescrituras de bucle durante acciones
+let actionTimeout = null;
+let cycles = 0;
+let cycleInterval = null;
+let degradationInterval = null;
+
+const BUNNY_STATES = {
+  NORMAL: &quot;(\\_/)\n( •_•)\n/[   ]\\&quot;,
+  SAD:    &quot;(\\_/)\n( ☹_☹)\n/[   ]\\&quot;,
+  EATING: &quot;(\\_/)\n( ʘ_ʘ) *nom\n/[   ]\\&quot;,
+  HAPPY:  &quot;(\\_/)\n( &gt;.&lt;) *~\n/[ ♥ ]\\&quot;,
+  DEAD:   &quot;(x_x)\n/| |\\&quot;
+};
+
+const RANDOM_EVENTS = [
+  { msg: &quot;Alerta: Micro-glitch en sector 7. El conejo se asustó.&quot;, hunger: 0, boredom: -10, affection: -5, type: 'warn' },
+  { msg: &quot;Spam detectado: Procesos basura ralentizan al conejito.&quot;, hunger: -5, boredom: -15, affection: 0, type: 'warn' },
+  { msg: &quot;Fuga de memoria: Se han perdido nutrientes digitales.&quot;, hunger: -15, boredom: 0, affection: 0, type: 'danger' },
+  { msg: &quot;Optimización de CPU: El espécimen se siente con energía.&quot;, hunger: 0, boredom: 10, affection: 5, type: 'sys' }
+];
+
+const barHunger = document.getElementById('bar-hunger');
+const barBoredom = document.getElementById('bar-boredom');
+const barAffection = document.getElementById('bar-affection');
+const bunnyRender = document.getElementById('bunny-render');
+const consoleLog = document.getElementById('consoleLog');
+const deathOverlay = document.getElementById('death-overlay');
+const statusDot = document.getElementById('statusDot');
+const cycleCountEl = document.getElementById('cycle-count');
+const viewport = document.getElementById('viewport');
+
+function startLoops() {
+  degradationInterval = setInterval(() =&gt; {
+    if (isDead) return;
+    stats.hunger = Math.max(0, stats.hunger - 3);
+    stats.boredom = Math.max(0, stats.boredom - 4);
+    stats.affection = Math.max(0, stats.affection - 3);
+    updateUI();
+  }, 2500);
+
+  cycleInterval = setInterval(() =&gt; {
+    if (isDead) return;
+    cycles++;
+    cycleCountEl.textContent = cycles;
+
+    if (Math.random() &lt; 0.18 &amp;&amp; !isAnimating) {
+      triggerRandomEvent();
+    }
+  }, 4000);
+}
+
+function updateUI() {
+  barHunger.style.width = stats.hunger + '%';
+  barBoredom.style.width = stats.boredom + '%';
+  barAffection.style.width = stats.affection + '%';
+
+  applyColorClass(barHunger, stats.hunger);
+  applyColorClass(barBoredom, stats.boredom);
+  applyColorClass(barAffection, stats.affection);
+
+  if (stats.hunger &lt;= 0 || stats.boredom &lt;= 0 || stats.affection &lt;= 0) {
+    triggerDeath();
+    return;
+  }
+
+  // Si está en medio de una animación interactiva, no sobreescribir el aspecto visual
+  if (isAnimating) return;
+
+  if (stats.hunger &lt; 30 || stats.boredom &lt; 30 || stats.affection &lt; 30) {
+    bunnyRender.textContent = BUNNY_STATES.SAD;
+    bunnyRender.className = &quot;ascii-bunny bunny-shake&quot;;
+    consoleLog.innerHTML = `&lt;span class=&quot;danger&quot;&gt;warning://&lt;/span&gt; Constantes críticas. Requiere atención.`;
+    statusDot.style.background = 'var(--yellow)';
+    statusDot.style.boxShadow = '0 0 8px var(--yellow)';
+  } else {
+    bunnyRender.textContent = BUNNY_STATES.NORMAL;
+    bunnyRender.className = &quot;ascii-bunny bunny-idle&quot;;
+    statusDot.style.background = 'var(--accent)';
+    statusDot.style.boxShadow = '0 0 8px var(--accent)';
+  }
+}
+
+function applyColorClass(el, val) {
+  if (val &lt;= 25) el.className = 'stat-bar low';
+  else if (val &lt;= 50) el.className = 'stat-bar warning';
+  else el.className = 'stat-bar';
+}
+
+function triggerTemporaryState(asciiState, logMsg, bunnyAnimClass) {
+  if (isDead) return;
+  isAnimating = true;
+  if (actionTimeout) clearTimeout(actionTimeout);
+
+  bunnyRender.textContent = asciiState;
+  bunnyRender.className = `ascii-bunny ${bunnyAnimClass || ''}`;
+  consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; ${logMsg}`;
+
+  actionTimeout = setTimeout(() =&gt; {
+    isAnimating = false;
+    updateUI();
+  }, 1200);
+}
+
+function spawnVisualObject(emoji, cssClass) {
+  const obj = document.createElement('div');
+  obj.className = `anim-object ${cssClass}`;
+  obj.textContent = emoji;
+  viewport.appendChild(obj);
+  
+  setTimeout(() =&gt; obj.remove(), 1100);
+}
+
+function spawnHeartsBurst() {
+  for (let i = 0; i &lt; 5; i++) {
+    setTimeout(() =&gt; {
+      if (isDead) return;
+      const heart = document.createElement('div');
+      heart.className = 'particle';
+      heart.textContent = '❤️';
+      heart.style.left = (35 + Math.random() * 30) + '%';
+      viewport.appendChild(heart);
+      setTimeout(() =&gt; heart.remove(), 800);
+    }, i * 100);
+  }
+}
+
+function actionFeed() {
+  if (isDead || isAnimating) return;
+  stats.hunger = Math.min(100, stats.hunger + 22);
+  
+  spawnVisualObject('🥕', 'carrot-fall');
+  
+  setTimeout(() =&gt; {
+    triggerTemporaryState(BUNNY_STATES.EATING, &quot;Inyectando paquete alimenticio beta-01...&quot;, &quot;bunny-bounce&quot;);
+  }, 350);
+}
+
+function actionPlay() {
+  if (isDead || isAnimating) return;
+  stats.boredom = Math.min(100, stats.boredom + 25);
+  
+  spawnVisualObject('⚽', 'ball-bounce');
+  
+  setTimeout(() =&gt; {
+    triggerTemporaryState(BUNNY_STATES.HAPPY, &quot;Objeto pelota lanzado. Diversión en ejecución.&quot;, &quot;bunny-bounce&quot;);
+  }, 200);
+}
+
+function actionPet() {
+  if (isDead || isAnimating) return;
+  stats.affection = Math.min(100, stats.affection + 18);
+  
+  spawnVisualObject('🖐️', 'hand-pet');
+  
+  setTimeout(() =&gt; {
+    spawnHeartsBurst();
+    triggerTemporaryState(BUNNY_STATES.HAPPY, &quot;Pulso de afecto sincronizado correctamente.&quot;, &quot;bunny-bounce&quot;);
+  }, 250);
+}
+
+function triggerRandomEvent() {
+  const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  stats.hunger = Math.max(0, Math.min(100, stats.hunger + event.hunger));
+  stats.boredom = Math.max(0, Math.min(100, stats.boredom + event.boredom));
+  stats.affection = Math.max(0, Math.min(100, stats.affection + event.affection));
+  
+  let prefix = 'sys://';
+  if (event.type === 'warn') prefix = '&lt;span class=&quot;warn&quot;&gt;warn://&lt;/span&gt;';
+  if (event.type === 'danger') prefix = '&lt;span class=&quot;danger&quot;&gt;err://&lt;/span&gt;';
+  
+  consoleLog.innerHTML = `${prefix} ${event.msg}`;
+  updateUI();
+}
+
+function triggerDeath() {
+  isDead = true;
+  clearInterval(cycleInterval);
+  clearInterval(degradationInterval);
+  bunnyRender.textContent = BUNNY_STATES.DEAD;
+  bunnyRender.className = &quot;ascii-bunny&quot;;
+  consoleLog.innerHTML = `&lt;span class=&quot;danger&quot;&gt;error://&lt;/span&gt; Enlace roto. Conejo fuera de línea.`;
+  statusDot.style.background = 'var(--red)';
+  statusDot.style.boxShadow = '0 0 8px var(--red)';
+  document.getElementById('final-cycles').textContent = cycles;
+  deathOverlay.classList.add('active');
+}
+
+function resetTamagotchi() {
+  stats = { hunger: 100, boredom: 100, affection: 100 };
+  isDead = false;
+  isAnimating = false;
+  cycles = 0;
+  cycleCountEl.textContent = cycles;
+  deathOverlay.classList.remove('active');
+  consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo reiniciado. Reinstalando conejito...`;
+  updateUI();
+  startLoops();
+}
+
+// Inicialización limpia de hilos y renderizado
+bunnyRender.textContent = BUNNY_STATES.NORMAL;
+updateUI();
+startLoops();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;" style="width:100%;height:560px;border:none;display:block;background:#07080b" title="My Pet"></iframe>
   </div>
   <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-pet','n')"></div>
   <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-pet','s')"></div>
