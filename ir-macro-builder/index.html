@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,31 +6,21 @@ cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
 <title>Flipper IR Macro Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0c0f;
-  --s1: #111318;
-  --s2: #181c23;
-  --border: #1e2530;
-  --acc: #ff6b00;
-  --acc2: #ff9a40;
-  --green: #39ff14;
-  --dim: #3a4455;
-  --text: #c8d4e8;
-  --muted: #5a6a80;
-  --danger: #ff3355;
-  --blue: #4af;
+:root{
+  --bg:#0a0c0f;--s1:#111318;--s2:#181c23;--border:#1e2530;
+  --acc:#ff6b00;--acc2:#ff9a40;--green:#39ff14;--dim:#3a4455;
+  --text:#c8d4e8;--muted:#5a6a80;--danger:#ff3355;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999;}
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,107,0,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-
 .wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 20px 60px;}
 
 /* HEADER */
-header{padding:28px 0 22px;border-bottom:1px solid var(--border);margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+header{padding:28px 0 20px;border-bottom:1px solid var(--border);margin-bottom:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
 .logo-tag{font-size:9px;letter-spacing:4px;color:var(--acc);text-transform:uppercase;display:block;margin-bottom:3px;}
-h1{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;text-shadow:0 0 30px rgba(255,107,0,.35);}
+h1{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:#fff;letter-spacing:-1px;text-shadow:0 0 28px rgba(255,107,0,.35);}
 h1 span{color:var(--acc);}
 .badge{margin-left:auto;font-size:9px;letter-spacing:2px;color:var(--green);border:1px solid var(--green);padding:4px 10px;animation:blink 2s step-end infinite;white-space:nowrap;}
 @keyframes blink{50%{opacity:.3;}}
@@ -40,66 +29,68 @@ h1 span{color:var(--acc);}
 .layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start;}
 
 /* PANELS */
-.panel{background:var(--s1);border:1px solid var(--border);padding:16px;margin-bottom:16px;}
+.panel{background:var(--s1);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
 .ptitle{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--acc);text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
 .ptitle::before{content:'';display:inline-block;width:5px;height:5px;background:var(--acc);box-shadow:0 0 6px var(--acc);}
+.ptitle-right{margin-left:auto;font-size:8px;color:var(--muted);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
 
-/* REMOTE SELECTOR */
-.remote-selector{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
-.search-row{display:flex;gap:8px;}
-.search-box{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 12px;outline:none;transition:border-color .15s;}
+/* ── REMOTE SELECTOR ── */
+.selector-wrap{display:flex;flex-direction:column;gap:10px;}
+
+/* Brand dropdown */
+.brand-row{display:flex;gap:8px;align-items:center;}
+.brand-row label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+select.brand-select{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:7px 10px;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a80'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+select.brand-select:focus{border-color:var(--acc);}
+select.brand-select option{background:var(--bg);}
+
+/* Search */
+.search-box{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 12px;outline:none;transition:border-color .15s;}
 .search-box:focus{border-color:var(--acc);}
 .search-box::placeholder{color:var(--muted);}
 
-.brand-filter{display:flex;gap:4px;flex-wrap:wrap;max-height:72px;overflow-y:auto;padding-bottom:4px;}
-.brand-chip{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s;background:var(--s2);white-space:nowrap;}
-.brand-chip:hover{border-color:var(--acc);color:var(--acc);}
-.brand-chip.active{border-color:var(--acc);color:var(--acc);background:rgba(255,107,0,.08);}
-.brand-chip.all-chip.active{border-color:var(--green);color:var(--green);background:rgba(57,255,20,.06);}
+/* Remote list */
+.remote-list{border:1px solid var(--border);max-height:260px;overflow-y:auto;}
+.remote-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;transition:background .12s;}
+.remote-item:last-child{border-bottom:none;}
+.remote-item:hover{background:rgba(255,107,0,.05);}
+.remote-item.active{background:rgba(255,107,0,.08);border-left:2px solid var(--acc);}
+.ri-brand{font-size:8px;letter-spacing:2px;color:var(--acc);text-transform:uppercase;flex-shrink:0;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ri-label{font-size:10px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ri-count{font-size:8px;color:var(--muted);flex-shrink:0;}
+.list-empty{padding:20px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;}
+.list-status{padding:6px 12px;font-size:8px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
 
-/* REMOTE LIST */
-.remote-list-wrap{position:relative;}
-.remote-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;max-height:300px;overflow-y:auto;padding-right:4px;}
-.remote-card{background:var(--s2);border:1px solid var(--border);padding:10px 12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:3px;}
-.remote-card:hover{border-color:var(--acc);background:rgba(255,107,0,.05);}
-.remote-card.selected{border-color:var(--acc);background:rgba(255,107,0,.08);box-shadow:inset 0 0 12px rgba(255,107,0,.06);}
-.rc-brand{font-size:9px;letter-spacing:2px;color:var(--acc);text-transform:uppercase;}
-.rc-name{font-size:10px;color:var(--text);line-height:1.3;}
-.rc-loading{font-size:9px;color:var(--muted);letter-spacing:1px;}
-
-.list-empty{padding:24px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;}
-
-/* SIGNAL GRID from loaded .ir */
-.sig-section{margin-bottom:8px;}
-.sig-section-title{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:10px;padding-left:2px;}
-.sig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:5px;}
-.sig-btn{background:var(--s2);border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px 4px;cursor:pointer;text-align:center;transition:all .12s;letter-spacing:.5px;text-transform:uppercase;line-height:1.3;}
+/* ── SIGNAL PANEL ── */
+.sig-panel-inner{min-height:80px;}
+.sig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:5px;margin-top:10px;}
+.sig-btn{background:var(--s2);border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:9px;padding:8px 4px;cursor:pointer;text-align:center;transition:all .12s;letter-spacing:.5px;text-transform:uppercase;line-height:1.3;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .sig-btn:hover{border-color:var(--acc);color:var(--acc);background:rgba(255,107,0,.07);}
-.sig-btn:active{transform:scale(.95);}
-.sig-btn .sig-icon{font-size:13px;display:block;margin-bottom:2px;}
+.sig-btn:active{transform:scale(.94);}
+.sig-icon{font-size:14px;}
+.sig-name{font-size:8px;}
 
-/* GLOBAL DELAY */
-.delay-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+/* delay row */
+.delay-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
 .delay-row label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
-input[type=number],input[type=text],select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;outline:none;transition:border-color .15s;width:100%;}
-input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--acc);}
-select option{background:var(--bg);}
+input[type=number],input[type=text]{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;outline:none;transition:border-color .15s;width:100%;}
+input[type=number]:focus,input[type=text]:focus{border-color:var(--acc);}
 
-/* MACRO SEQUENCE */
-.macro-list{min-height:100px;margin-bottom:10px;}
-.macro-empty{border:1px dashed var(--border);padding:28px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;}
-.macro-item{display:flex;align-items:center;gap:6px;padding:7px 8px;background:var(--s2);border:1px solid var(--border);margin-bottom:3px;cursor:grab;animation:slideIn .18s ease;}
-@keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
-.macro-item:hover{border-color:var(--dim);}
+/* ── MACRO ── */
+.macro-list{min-height:90px;margin-bottom:10px;}
+.macro-empty{border:1px dashed var(--border);padding:24px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;}
+.macro-item{display:flex;align-items:center;gap:6px;padding:7px 8px;background:var(--s2);border:1px solid var(--border);margin-bottom:3px;cursor:grab;animation:sIn .18s ease;}
+@keyframes sIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
 .macro-item.dragging{opacity:.3;border-color:var(--acc);}
 .macro-item.drag-over{border-color:var(--acc);background:rgba(255,107,0,.05);}
 .item-num{font-size:8px;color:var(--muted);width:16px;text-align:right;flex-shrink:0;}
-.item-brand{font-size:8px;color:var(--acc);flex-shrink:0;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.item-brand{font-size:8px;color:var(--acc);flex-shrink:0;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .item-name{flex:1;font-size:10px;color:var(--text);text-transform:uppercase;letter-spacing:.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.delay-inp{width:52px;padding:2px 5px;font-size:9px;background:var(--bg);border:1px solid var(--border);color:var(--acc);font-family:'Share Tech Mono',monospace;text-align:right;flex-shrink:0;}
-.ms-label{font-size:8px;color:var(--muted);flex-shrink:0;}
+.delay-inp{width:50px;padding:2px 5px;font-size:9px;background:var(--bg);border:1px solid var(--border);color:var(--acc);font-family:'Share Tech Mono',monospace;text-align:right;flex-shrink:0;}
+.ms-lbl{font-size:8px;color:var(--muted);flex-shrink:0;}
 .rm-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-size:10px;cursor:pointer;padding:2px 5px;flex-shrink:0;transition:all .12s;font-family:'Share Tech Mono',monospace;}
 .rm-btn:hover{border-color:var(--danger);color:var(--danger);}
+.dh{color:var(--dim);cursor:grab;font-size:11px;padding:0 2px;flex-shrink:0;}
 
 /* STATS */
 .stats-bar{display:flex;gap:16px;padding:8px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;}
@@ -112,8 +103,6 @@ select option{background:var(--bg);}
 .btn-acc:hover{background:var(--acc2);box-shadow:0 0 18px rgba(255,107,0,.35);}
 .btn-out{background:transparent;border:1px solid var(--dim);color:var(--muted);}
 .btn-out:hover{border-color:var(--acc);color:var(--acc);}
-.btn-green{background:var(--green);color:#000;font-weight:700;}
-.btn-green:hover{box-shadow:0 0 18px rgba(57,255,20,.35);}
 .btn-full{width:100%;text-align:center;}
 .btn-row{display:flex;gap:6px;margin-bottom:10px;}
 
@@ -123,11 +112,11 @@ select option{background:var(--bg);}
 .tab.active{background:var(--s1);color:var(--acc);border-color:var(--acc);border-bottom-color:var(--s1);z-index:1;}
 .tab-content{background:var(--s1);border:1px solid var(--border);padding:14px;display:none;}
 .tab-content.active{display:block;}
-pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-space:pre;overflow-x:auto;line-height:1.6;max-height:280px;overflow-y:auto;}
+.tab-rel{position:relative;}
+pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-space:pre;overflow-x:auto;line-height:1.6;max-height:260px;overflow-y:auto;}
 .copy-btn{position:absolute;top:10px;right:10px;font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:1px;padding:4px 8px;background:transparent;border:1px solid var(--dim);color:var(--muted);cursor:pointer;transition:all .12s;}
 .copy-btn:hover{border-color:var(--acc);color:var(--acc);}
 .copy-btn.copied{border-color:var(--green);color:var(--green);}
-.tab-rel{position:relative;}
 
 /* FLIPPER PREVIEW */
 .flipper-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin:12px 0;}
@@ -137,27 +126,24 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 .scr-item{font-size:7px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .scr-item.sel{background:var(--green);color:#000;padding:0 2px;opacity:1;}
 
-/* MACRO CONFIG */
+/* CONFIG */
 .cfg-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
 .cfg-row label{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;flex-shrink:0;width:110px;}
 .cfg-row input{flex:1;}
 
 /* GUIDE */
-.steps{display:flex;flex-direction:column;gap:7px;margin-top:10px;}
+.steps{display:flex;flex-direction:column;gap:7px;margin-top:8px;}
 .step{display:flex;gap:8px;align-items:flex-start;font-size:9px;color:var(--muted);line-height:1.6;}
 .step-n{font-family:'Orbitron',sans-serif;font-size:8px;color:var(--acc);border:1px solid var(--acc);width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .divider{height:1px;background:var(--border);margin:12px 0;}
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#000;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;padding:8px 20px;opacity:0;transition:all .25s;z-index:10000;pointer-events:none;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* LOADING SPINNER */
+/* SPINNER */
 .spinner{display:inline-block;width:10px;height:10px;border:2px solid var(--border);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* DRAG HANDLE */
-.dh{color:var(--dim);cursor:grab;font-size:11px;padding:0 2px;flex-shrink:0;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#000;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;padding:8px 20px;opacity:0;transition:all .25s;z-index:10000;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:3px;height:3px;}
@@ -165,7 +151,7 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 ::-webkit-scrollbar-thumb{background:var(--dim);}
 ::-webkit-scrollbar-thumb:hover{background:var(--acc);}
 
-@media(max-width:800px){.layout{grid-template-columns:1fr;}.sig-grid{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));}}
+@media(max-width:800px){.layout{grid-template-columns:1fr;}.sig-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));}}
 </style>
 </head>
 <body>
@@ -174,60 +160,72 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 <header>
   <div>
     <span class="logo-tag">// Flipper Zero</span>
-    <h1>IR <span>MACRO</span> BUILDER <span style="font-size:13px;letter-spacing:1px;color:var(--muted);">v2</span></h1>
+    <h1>IR <span>MACRO</span> BUILDER <span style="font-size:12px;color:var(--muted);letter-spacing:1px;">v2</span></h1>
   </div>
   <div class="badge">● SYSTEM READY</div>
 </header>
 
 <div class="layout">
-<!-- ═══════════════ LEFT ═══════════════ -->
+
+<!-- ══════════════════ LEFT ══════════════════ -->
 <div>
 
   <!-- REMOTE SELECTOR -->
   <div class="panel">
     <div class="ptitle">
       Seleccionar mando
-      <span id="remoteCount" style="margin-left:auto;font-size:8px;color:var(--muted);">cargando...</span>
+      <span class="ptitle-right" id="totalCount">— mandos</span>
     </div>
 
-    <div class="remote-selector">
-      <div class="search-row">
-        <input class="search-box" id="searchBox" placeholder="🔍  Buscar mando o marca..." oninput="filterRemotes()" />
+    <div class="selector-wrap">
+
+      <!-- Filtro por marca (dropdown) -->
+      <div class="brand-row">
+        <label>Marca</label>
+        <select class="brand-select" id="brandSelect" onchange="applyFilters()">
+          <option value="">— Todas las marcas —</option>
+        </select>
       </div>
-      <div class="brand-filter" id="brandFilter"></div>
-    </div>
 
-    <div class="remote-list-wrap">
-      <div class="remote-list" id="remoteList">
-        <div class="list-empty"><span class="spinner"></span> Cargando base de datos...</div>
+      <!-- Búsqueda libre -->
+      <input class="search-box" id="searchBox" placeholder="🔍  Buscar por nombre o modelo..." oninput="applyFilters()" />
+
+      <!-- Lista resultados -->
+      <div>
+        <div class="list-status">
+          <span id="listStatus">Cargando...</span>
+          <span id="listCount"></span>
+        </div>
+        <div class="remote-list" id="remoteList">
+          <div class="list-empty"><span class="spinner"></span> Iniciando...</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- SIGNAL LIBRARY (from loaded .ir) -->
-  <div class="panel" id="signalPanel" style="display:none;">
+  <!-- BUTTONS DEL MANDO SELECCIONADO -->
+  <div class="panel" id="signalPanel">
     <div class="ptitle">
-      Botones de <span id="selectedRemoteName" style="color:#fff;margin-left:4px;font-size:9px;"></span>
-      <span id="sigCount" style="margin-left:auto;font-size:8px;color:var(--muted);"></span>
+      Botones disponibles
+      <span class="ptitle-right" id="sigCount">— selecciona un mando —</span>
     </div>
 
-    <div class="delay-row">
-      <label>Delay por defecto</label>
-      <input type="number" id="globalDelay" value="200" min="0" max="9999" style="width:80px;" />
+    <div class="delay-row" style="margin-bottom:12px;">
+      <label>Delay al añadir</label>
+      <input type="number" id="globalDelay" value="200" min="0" max="9999" style="width:76px;" />
       <span style="font-size:9px;color:var(--muted);">ms</span>
     </div>
 
-    <div id="signalSections"></div>
-  </div>
-
-  <div class="panel" id="emptySignalPanel">
-    <div style="padding:20px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;">
-      // Selecciona un mando arriba<br>para ver sus botones disponibles
+    <div class="sig-panel-inner" id="signalGrid">
+      <div class="list-empty" style="border:1px dashed var(--border);">
+        // Selecciona un mando arriba<br>para ver sus botones
+      </div>
     </div>
   </div>
 
 </div>
-<!-- ═══════════════ RIGHT ═══════════════ -->
+
+<!-- ══════════════════ RIGHT ══════════════════ -->
 <div>
 
   <!-- MACRO CONFIG -->
@@ -243,14 +241,13 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
         <input type="number" id="repeatCount" value="1" min="1" max="10" oninput="generateCode();" />
       </div>
     </div>
-
-    <!-- FLIPPER PREVIEW -->
+    <!-- Flipper Preview -->
     <div class="flipper-wrap">
-      <div class="flipper-screen" id="flipperScreen">
+      <div class="flipper-screen">
         <div class="scr-title" id="scrTitle">IR REMOTE ▸ MY_MACRO</div>
         <div id="scrItems"></div>
       </div>
-      <span style="font-size:8px;color:var(--muted);letter-spacing:2px;">PREVIEW</span>
+      <span style="font-size:8px;color:var(--muted);letter-spacing:2px;">FLIPPER PREVIEW</span>
     </div>
   </div>
 
@@ -258,17 +255,17 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
   <div class="panel">
     <div class="ptitle">
       Secuencia del macro
-      <span id="itemCount" style="margin-left:auto;font-size:8px;color:var(--muted);">0 señales</span>
+      <span class="ptitle-right" id="itemCount">0 señales</span>
     </div>
 
     <div class="stats-bar">
       <div><div class="stat-val" id="statCount">0</div><div class="stat-label">Señales</div></div>
-      <div><div class="stat-val" id="statTime">0ms</div><div class="stat-label">Tiempo total</div></div>
+      <div><div class="stat-val" id="statTime">0ms</div><div class="stat-label">Duración</div></div>
       <div><div class="stat-val" id="statSize">0B</div><div class="stat-label">Tamaño .ir</div></div>
     </div>
 
     <div class="macro-list" id="macroList">
-      <div class="macro-empty">// Selecciona un mando y pulsa<br>sus botones para añadirlos</div>
+      <div class="macro-empty">// Añade señales desde el panel izquierdo</div>
     </div>
 
     <div class="btn-row">
@@ -278,7 +275,7 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 
     <div class="divider"></div>
 
-    <!-- EXPORT TABS -->
+    <!-- EXPORT -->
     <div class="tab-bar">
       <div class="tab active" onclick="switchTab('ir')">archivo .ir</div>
       <div class="tab" onclick="switchTab('c')">código C</div>
@@ -288,7 +285,7 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
     <div class="tab-content active tab-rel" id="tab-ir">
       <button class="copy-btn" onclick="copyTab('ir',this)">COPIAR</button>
       <pre id="code-ir">// Añade señales para generar el archivo</pre>
-      <div style="margin-top:10px;display:flex;gap:6px;">
+      <div style="margin-top:10px;">
         <button class="btn btn-acc btn-full" onclick="downloadFile('ir')">⬇ Descargar .ir</button>
       </div>
     </div>
@@ -303,27 +300,22 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 
     <div class="tab-content" id="tab-guide">
       <div style="font-size:9px;color:var(--muted);line-height:1.7;">
-        <div style="color:var(--acc);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;margin-bottom:8px;">USO RÁPIDO — ARCHIVO .IR</div>
+        <div style="color:var(--acc);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;margin-bottom:8px;">USO — ARCHIVO .IR</div>
         <div class="steps">
-          <div class="step"><div class="step-n">1</div><span>Selecciona un mando de la base de datos</span></div>
-          <div class="step"><div class="step-n">2</div><span>Pulsa los botones para añadirlos a la secuencia (puedes mezclar mandos)</span></div>
-          <div class="step"><div class="step-n">3</div><span>Ajusta los delays entre señales</span></div>
-          <div class="step"><div class="step-n">4</div><span>Descarga el <b style="color:var(--text);">.ir</b> y cópialo en <b style="color:var(--green);">SD/infrared/</b></span></div>
-          <div class="step"><div class="step-n">5</div><span>Flipper: <b style="color:var(--text);">Infrared → Open file</b> → tu macro aparece como un botón</span></div>
+          <div class="step"><div class="step-n">1</div><span>Selecciona una marca y modelo de mando</span></div>
+          <div class="step"><div class="step-n">2</div><span>Pulsa los botones para añadirlos a la secuencia. Puedes combinar botones de distintos mandos</span></div>
+          <div class="step"><div class="step-n">3</div><span>Ajusta el delay de cada señal arrastrando para reordenar</span></div>
+          <div class="step"><div class="step-n">4</div><span>Descarga el <b style="color:var(--text);">.ir</b> → cópialo en <b style="color:var(--green);">SD/infrared/</b></span></div>
+          <div class="step"><div class="step-n">5</div><span>Flipper → Infrared → Open file → tu macro aparece como un solo botón</span></div>
         </div>
         <div class="divider"></div>
         <div style="color:var(--acc);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;margin-bottom:8px;">COMPILAR COMO APP NATIVA (.FAP)</div>
         <div class="steps">
           <div class="step"><div class="step-n">1</div><span>Descarga el <b style="color:var(--text);">.c</b> generado</span></div>
-          <div class="step"><div class="step-n">2</div><span>Clona el firmware: <b style="color:var(--green);">github.com/flipperdevices/flipperzero-firmware</b></span></div>
+          <div class="step"><div class="step-n">2</div><span><b style="color:var(--green);">git clone --recursive</b> github.com/flipperdevices/flipperzero-firmware</span></div>
           <div class="step"><div class="step-n">3</div><span>Copia la carpeta <b style="color:var(--text);">ir_macro/</b> en <b style="color:var(--green);">applications_user/</b></span></div>
-          <div class="step"><div class="step-n">4</div><span>Compila: <b style="color:var(--green);">./fbt fap_ir_macro</b></span></div>
-          <div class="step"><div class="step-n">5</div><span>Copia el <b style="color:var(--text);">.fap</b> a <b style="color:var(--green);">SD/apps/Infrared/</b></span></div>
-        </div>
-        <div class="divider"></div>
-        <div style="font-size:8px;line-height:1.8;color:var(--muted);">
-          ⚠ Los valores address/command de los archivos .ir son los reales capturados con Flipper.<br>
-          Puedes mezclar botones de distintos mandos en un mismo macro.
+          <div class="step"><div class="step-n">4</div><span><b style="color:var(--green);">./fbt fap_ir_macro</b> → genera el .fap</span></div>
+          <div class="step"><div class="step-n">5</div><span>Copia el .fap a <b style="color:var(--green);">SD/apps/Infrared/</b></span></div>
         </div>
       </div>
     </div>
@@ -332,272 +324,556 @@ pre{font-family:'Share Tech Mono',monospace;font-size:9px;color:#7eb8a0;white-sp
 </div>
 </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIG — ajusta estas rutas a tu repo
-// ═══════════════════════════════════════════
-const REPO_BASE = 'https://raw.githubusercontent.com/robertts-s/robertts-s.github.io/main/ir-macro-builder';
-const REMOTES_JSON = `${REPO_BASE}/remotes.json`;
+// ═══════════════════════════════════════════════════════
+// BASE DE DATOS DE MANDOS — cargada desde el repo
+// ═══════════════════════════════════════════════════════
+// Ruta relativa — funciona cuando la app se sirve desde GitHub Pages
+// (roberttsOS.github.io/ir-macro-builder/index.html)
+// Los .ir están en la misma carpeta: ./remotes_ir/
+const RAW_BASE = './remotes_ir';
 
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let allRemotes = [];
-let filteredRemotes = [];
-let activeBrand = 'ALL';
-let selectedRemote = null;
-let loadedSignals = [];   // señales del .ir cargado
+const ALL_REMOTES = [
+  {brand:'AKAI',label:'AKAI ATE 22Y604W',file:'AKAI_ATE_22Y604W.ir'},
+  {brand:'Amazon',label:'AmazonBasics TV Remote',file:'AmazonBasics_TV_Remote.ir'},
+  {brand:'Amazon',label:'FireTV Omni Series 4K',file:'FireTV_Omni_Series_4K.ir'},
+  {brand:'Android TV',label:'Android TV MXQ',file:'Android_TV_MXQ.ir'},
+  {brand:'AORUS',label:'AORUS Monitor',file:'AORUS_Monitor.ir'},
+  {brand:'APEX',label:'APEX LE4643T',file:'APEX_LE4643T.ir'},
+  {brand:'BAIRD',label:'BAIRD T15011DLEDDS RC 6',file:'BAIRD_T15011DLEDDS_RC-6.ir'},
+  {brand:'Bauhn',label:'Bauhn ATV 50FHD4',file:'Bauhn_ATV_50FHD4.ir'},
+  {brand:'Bauhn',label:'Bauhn tv',file:'Bauhn_tv.ir'},
+  {brand:'BBK',label:'BBK TV LEM 1071',file:'BBK_TV_LEM-1071.ir'},
+  {brand:'Blaupunkt',label:'Blaupunkt',file:'Blaupunkt.ir'},
+  {brand:'Blitzwolf',label:'Blitzwolf BWPCM2',file:'Blitzwolf_BWPCM2.ir'},
+  {brand:'Bolva',label:'Bolva TV',file:'Bolva_TV.ir'},
+  {brand:'Bose',label:'Bose TV',file:'Bose_TV.ir'},
+  {brand:'Brandt',label:'Brandt B3228HD',file:'Brandt_B3228HD.ir'},
+  {brand:'Brandt',label:'Brandt B3230HD TV',file:'Brandt_B3230HD_TV.ir'},
+  {brand:'BUSH',label:'BUSH TV VL32HDLED',file:'BUSH_TV_VL32HDLED.ir'},
+  {brand:'CCE',label:'CCE RC512 Remote',file:'CCE_RC512_Remote.ir'},
+  {brand:'Clevertouch',label:'Clevertouch Screen Working',file:'Clevertouch Screen Working.ir'},
+  {brand:'ContinentalEdison',label:'ContinentalEdison',file:'ContinentalEdison.ir'},
+  {brand:'ContinentalEdison',label:'ContinentalEdison CELED32JBL7',file:'ContinentalEdison_CELED32JBL7.ir'},
+  {brand:'ContinentalEdison',label:'ContinentalEdison CELED502723',file:'ContinentalEdison_CELED502723.ir'},
+  {brand:'Cranker',label:'Cranker generic',file:'Cranker_generic.ir'},
+  {brand:'Crown',label:'Crown 22111',file:'Crown_22111.ir'},
+  {brand:'Daewoo',label:'Daewood Parsed',file:'Daewood_Parsed.ir'},
+  {brand:'Denver',label:'Denver LED 3271',file:'Denver_LED-3271.ir'},
+  {brand:'Devant',label:'Devant Unknown Model',file:'Devant_Unknown_Model.ir'},
+  {brand:'Dual',label:'Dual DL 32HD 002',file:'Dual_DL-32HD-002.ir'},
+  {brand:'Dynex',label:'Dynex DX RC01A 12',file:'Dynex_DX-RC01A-12.ir'},
+  {brand:'Dynex',label:'Dynex EN21669D',file:'Dynex_EN21669D.ir'},
+  {brand:'DYON',label:'DYON Movie Smart 32 XT',file:'DYON_Movie_Smart_32_XT.ir'},
+  {brand:'EdenWood',label:'EdenWood TV',file:'EdenWood_TV.ir'},
+  {brand:'Element',label:'Element 100 Series TV',file:'Element_100-Series_TV.ir'},
+  {brand:'Element',label:'Element FullRemote',file:'Element_FullRemote.ir'},
+  {brand:'Element',label:'Element TV',file:'Element_TV.ir'},
+  {brand:'Element',label:'Elements TV',file:'Elements_TV.ir'},
+  {brand:'Elitelux',label:'Elitelux L32HD1000',file:'Elitelux_L32HD1000.ir'},
+  {brand:'Emerson',label:'Emerson 32FNT004',file:'Emerson_32FNT004.ir'},
+  {brand:'Emerson',label:'Emerson remote NH303UD',file:'Emerson_remote_NH303UD.ir'},
+  {brand:'Enseo',label:'Enseo',file:'Enseo.ir'},
+  {brand:'Enseo',label:'Enseo full',file:'Enseo_full.ir'},
+  {brand:'Erisson',label:'Erisson AL52D B',file:'Erisson_AL52D_B.ir'},
+  {brand:'Escalade',label:'Escalade TV',file:'Escalade_TV.ir'},
+  {brand:'EssentielB',label:'Essentiel B TV',file:'Essentiel_B_TV.ir'},
+  {brand:'EssentielB',label:'EssentielB',file:'EssentielB.ir'},
+  {brand:'Fetch TV',label:'Fetch TV Box AUS',file:'Fetch_TV_Box_AUS.ir'},
+  {brand:'Ffalcon',label:'Ffalcon SF1 Smart TV',file:'Ffalcon_SF1_Smart_TV.ir'},
+  {brand:'FINLUX',label:'FINLUX',file:'FINLUX.ir'},
+  {brand:'Funai',label:'Funai',file:'Funai.ir'},
+  {brand:'Furrion',label:'Furrion',file:'Furrion.ir'},
+  {brand:'GPX',label:'Gpx',file:'Gpx.ir'},
+  {brand:'Grandin',label:'Grandin',file:'Grandin.ir'},
+  {brand:'Grandin',label:'Grandin Unknown Model',file:'Grandin_Unknown_Model.ir'},
+  {brand:'Grundig',label:'GRUNDIG',file:'GRUNDIG.ir'},
+  {brand:'Grundig',label:'Grundig 2',file:'Grundig_2.ir'},
+  {brand:'Grundig',label:'GRUNDIG UNKNOWN',file:'GRUNDIG_UNKNOWN.ir'},
+  {brand:'GuestTek',label:'GuestTek Marriot Hotel',file:'GuestTek_Marriot_Hotel.ir'},
+  {brand:'Hisense',label:'Hisense 32A4HAU',file:'Hisense_32A4HAU.ir'},
+  {brand:'Hisense',label:'Hisense 55K3201GUWUS',file:'Hisense_55K3201GUWUS.ir'},
+  {brand:'Hisense',label:'Hisense 65K3300UW',file:'Hisense_65K3300UW.ir'},
+  {brand:'Hisense',label:'Hisense EN 33926A',file:'Hisense_EN_33926A.ir'},
+  {brand:'Hisense',label:'Hisense EN3AH39H',file:'Hisense_EN3AH39H.ir'},
+  {brand:'Hisense',label:'Hisense EN3Y39H',file:'Hisense_EN3Y39H.ir'},
+  {brand:'Hisense',label:'Hisense RokuTV',file:'Hisense_RokuTV.ir'},
+  {brand:'Hisense',label:'Hisense TV ZDB2190126',file:'Hisense_TV_ZDB2190126.ir'},
+  {brand:'Hitachi',label:'Hitachi 43140',file:'Hitachi_43140.ir'},
+  {brand:'Hitachi',label:'Hitachi LE46H508',file:'Hitachi_LE46H508.ir'},
+  {brand:'Hitachi',label:'Hitachi RC43140',file:'Hitachi_RC43140.ir'},
+  {brand:'Hitachi',label:'Hitachi SmartTV 43140',file:'Hitachi_SmartTV_43140.ir'},
+  {brand:'Insignia',label:'Insignia',file:'Insignia.ir'},
+  {brand:'Insignia',label:'Insignia NS RCFNA 21',file:'Insignia_NS_RCFNA_21.ir'},
+  {brand:'JVC',label:'JVC 4KTV',file:'JVC_4KTV.ir'},
+  {brand:'Kendo',label:'Kendo CP20M36VT',file:'Kendo_CP20M36VT.ir'},
+  {brand:'KRAFT',label:'KRAFT KTV',file:'KRAFT_KTV.ir'},
+  {brand:'LG',label:'LG',file:'LG.ir'},
+  {brand:'LG',label:'LG 27GR95QE TV',file:'LG_27GR95QE_TV.ir'},
+  {brand:'LG',label:'LG 32LF650V',file:'LG_32LF650V.ir'},
+  {brand:'LG',label:'LG 32LN5406',file:'LG_32LN5406.ir'},
+  {brand:'LG',label:'LG 43NANO779PA',file:'LG_43NANO779PA.ir'},
+  {brand:'LG',label:'LG 48LV340H',file:'LG_48LV340H.ir'},
+  {brand:'LG',label:'LG 4K TV',file:'LG_4K_TV.ir'},
+  {brand:'LG',label:'LG 55LB870V ZA',file:'LG_55LB870V_ZA.ir'},
+  {brand:'LG',label:'LG 55UN7300AUD',file:'LG_55UN7300AUD.ir'},
+  {brand:'LG',label:'LG 75UJ6470',file:'LG_75UJ6470.ir'},
+  {brand:'LG',label:'LG AKB69680401',file:'LG_AKB69680401.ir'},
+  {brand:'LG',label:'LG AKB72913118',file:'LG_AKB72913118.ir'},
+  {brand:'LG',label:'LG AKB72914048',file:'LG_AKB72914048.ir'},
+  {brand:'LG',label:'LG AKB72915206',file:'LG_AKB72915206.ir'},
+  {brand:'LG',label:'LG AKB73275675',file:'LG_AKB73275675.ir'},
+  {brand:'LG',label:'LG AKB75095307',file:'LG_AKB75095307.ir'},
+  {brand:'LG',label:'LG AKB75675311',file:'LG_AKB75675311.ir'},
+  {brand:'LG',label:'LG AKB75855501',file:'LG_AKB75855501.ir'},
+  {brand:'LG',label:'LG C1',file:'LG_C1.ir'},
+  {brand:'LG',label:'Lg c9 magic remote',file:'Lg_c9_magic_remote.ir'},
+  {brand:'LG',label:'LG Factory Service',file:'LG_Factory_Service.ir'},
+  {brand:'LG',label:'LG Hotel tv',file:'LG_Hotel_tv.ir'},
+  {brand:'LG',label:'LG Hotel TV Home2',file:'LG_Hotel_TV_Home2.ir'},
+  {brand:'LG',label:'LG MKJ39170828 Service',file:'LG_MKJ39170828_Service.ir'},
+  {brand:'LG',label:'LG MR21GC Magic Remote',file:'LG_MR21GC_Magic_Remote.ir'},
+  {brand:'LG',label:'LG TV 42LF5800',file:'LG_TV_42LF5800.ir'},
+  {brand:'LG',label:'LG TV AKB75375604',file:'LG_TV_AKB75375604.ir'},
+  {brand:'Lodgenet',label:'lodgenet lrc3220',file:'lodgenet_lrc3220.ir'},
+  {brand:'LOEWE',label:'LOEWE TV',file:'LOEWE_TV.ir'},
+  {brand:'Manta',label:'Manta TV',file:'Manta_TV.ir'},
+  {brand:'Manta',label:'Manta TV 2',file:'Manta_TV_2.ir'},
+  {brand:'Marriott',label:'Marriott BONVoY Remote',file:'Marriott-BONVoY_Remote.ir'},
+  {brand:'Matsui',label:'Matsui 1435b',file:'Matsui_1435b.ir'},
+  {brand:'Medion',label:'Medion MD21302',file:'Medion_MD21302.ir'},
+  {brand:'Medion',label:'Medion MD31802',file:'Medion_MD31802.ir'},
+  {brand:'Mivar',label:'Mivar LCD TV',file:'Mivar_LCD_TV.ir'},
+  {brand:'NEC',label:'NEC',file:'NEC.ir'},
+  {brand:'NEC',label:'NEC E425',file:'NEC_E425.ir'},
+  {brand:'Neo',label:'Neo TV',file:'Neo_TV.ir'},
+  {brand:'NEVIR',label:'NEVIR NVR 7409 39HD N',file:'NEVIR_NVR-7409-39HD-N.ir'},
+  {brand:'Oky',label:'Oky TV',file:'Oky_TV.ir'},
+  {brand:'Onn',label:'Onn Roku TV',file:'Onn_Roku_TV.ir'},
+  {brand:'Panasonic',label:'Panasonic 58JX800 Series',file:'Panasonic_58JX800_Series.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYA 152',file:'Panasonic_N2QAYA_152.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYB000705',file:'Panasonic_N2QAYB000705.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYB000715',file:'Panasonic_N2QAYB000715.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYB000752',file:'Panasonic_N2QAYB000752.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYB000752 Full',file:'Panasonic_N2QAYB000752_Full.ir'},
+  {brand:'Panasonic',label:'Panasonic N2QAYB000926',file:'Panasonic_N2QAYB000926.ir'},
+  {brand:'Panasonic',label:'Panasonic TC P50S2',file:'Panasonic_TC-P50S2.ir'},
+  {brand:'Panasonic',label:'Panasonic TC P50U1',file:'Panasonic_TC-P50U1.ir'},
+  {brand:'Panasonic',label:'Panasonic TH 43HS550K',file:'Panasonic_TH-43HS550K.ir'},
+  {brand:'Panasonic',label:'Panasonic TX 42AS650E',file:'Panasonic_TX_42AS650E.ir'},
+  {brand:'Panasonic',label:'Panasonic TX 43GXW584',file:'Panasonic_TX_43GXW584.ir'},
+  {brand:'Panasonic',label:'Panasonic TX L42E5E',file:'Panasonic_TX_L42E5E.ir'},
+  {brand:'Panasonic',label:'Panasonic TX P50C10E',file:'Panasonic_TX-P50C10E.ir'},
+  {brand:'Panasonic',label:'Panasonic Unknown Full',file:'Panasonic_Unknown_Full.ir'},
+  {brand:'PD108',label:'PD108 420',file:'PD108-420.ir'},
+  {brand:'Philips',label:'Philips 14PT136B00',file:'Philips_14PT136B00.ir'},
+  {brand:'Philips',label:'Philips 22IT TV Monitor',file:'Philips_22IT_TV_Monitor.ir'},
+  {brand:'Philips',label:'Philips 32PFL4208T',file:'Philips_32PFL4208T.ir'},
+  {brand:'Philips',label:'Philips 32PFL7403S',file:'Philips_32PFL7403S.ir'},
+  {brand:'Philips',label:'Philips 32PFL7962D12',file:'Philips_32PFL7962D12.ir'},
+  {brand:'Philips',label:'Philips 5766 Series',file:'Philips_5766_Series.ir'},
+  {brand:'Philips',label:'Philips generic',file:'Philips_generic.ir'},
+  {brand:'Philips',label:'Philips sf256',file:'Philips_sf256.ir'},
+  {brand:'Philips',label:'Philips TV 14PV172 08',file:'Philips_TV_14PV172_08.ir'},
+  {brand:'Philips',label:'Philips TV 48OLED806',file:'Philips_TV_48OLED806.ir'},
+  {brand:'Philips',label:'Philips TV 7000LED 42PFL7695H',file:'Philips_TV_7000LED_42PFL7695H.ir'},
+  {brand:'Philips',label:'Philips TV 7956 Series',file:'Philips_TV_7956_Series.ir'},
+  {brand:'Philips',label:'Philips TV Universal',file:'Philips_TV_Universal.ir'},
+  {brand:'Philips',label:'Philips XXPFL9955H',file:'Philips_XXPFL9955H.ir'},
+  {brand:'Philips',label:'PhilipsTV',file:'PhilipsTV.ir'},
+  {brand:'Platinum',label:'Platinum PT2020LED',file:'Platinum_PT2020LED.ir'},
+  {brand:'RCA',label:'RCA CRK50A',file:'RCA_CRK50A.ir'},
+  {brand:'RCA',label:'RCA P46731AT TV',file:'RCA_P46731AT_TV.ir'},
+  {brand:'RCA',label:'RCA RCR314WR RCA313BR',file:'RCA_RCR314WR_ RCA313BR.ir'},
+  {brand:'RCA',label:'RCA RokuTV RTR4061 B CA',file:'RCA_RokuTV_RTR4061-B-CA.ir'},
+  {brand:'RCA',label:'RCA RT2471 AC',file:'RCA_RT2471_AC.ir'},
+  {brand:'RCA',label:'RCA TV 2',file:'RCA_TV_2.ir'},
+  {brand:'Roku',label:'Roku Standalone',file:'Roku_Standalone.ir'},
+  {brand:'Samsung',label:'Samsung',file:'Samsung.ir'},
+  {brand:'Samsung',label:'Samsung aa59',file:'Samsung_aa59.ir'},
+  {brand:'Samsung',label:'Samsung AA59 00580A',file:'Samsung_AA59-00580A.ir'},
+  {brand:'Samsung',label:'Samsung AA59 00741A',file:'Samsung_AA59_00741A.ir'},
+  {brand:'Samsung',label:'Samsung AA81 00243A',file:'Samsung_AA81-00243A.ir'},
+  {brand:'Samsung',label:'Samsung BN59',file:'Samsung_BN59.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01178W',file:'Samsung_BN59_01178W.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01180A',file:'Samsung_BN59_01180A.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01198 R',file:'Samsung_BN59_01198_R.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01247A',file:'Samsung_BN59_01247A.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01301A',file:'Samsung_BN59_01301A.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01303A',file:'Samsung_BN59_01303A.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01315B',file:'Samsung_BN59_01315B.ir'},
+  {brand:'Samsung',label:'Samsung BN59 01358C',file:'Samsung_BN59_01358C.ir'},
+  {brand:'Samsung',label:'Samsung BN5901175N',file:'Samsung_BN5901175N.ir'},
+  {brand:'Samsung',label:'Samsung Broadband Hospitality',file:'Samsung_Broadband_Hospitality.ir'},
+  {brand:'Samsung',label:'Samsung E6',file:'Samsung_E6.ir'},
+  {brand:'Samsung',label:'Samsung H6300 TV',file:'Samsung_H6300_TV.ir'},
+  {brand:'Samsung',label:'Samsung HQ24ED470AK',file:'Samsung_HQ24ED470AK.ir'},
+  {brand:'Samsung',label:'Samsung LE37S71B',file:'Samsung_LE37S71B.ir'},
+  {brand:'Samsung',label:'Samsung LE40R87BD',file:'Samsung_LE40R87BD.ir'},
+  {brand:'Samsung',label:'Samsung LN46C650L1F',file:'Samsung_LN46C650L1F.ir'},
+  {brand:'Samsung',label:'Samsung LW17E34C',file:'Samsung_LW17E34C.ir'},
+  {brand:'Samsung',label:'Samsung P2770HD',file:'Samsung_P2770HD.ir'},
+  {brand:'Samsung',label:'Samsung QM55RA',file:'Samsung_QM55RA.ir'},
+  {brand:'Samsung',label:'Samsung Royal Caribbean',file:'Samsung_Royal_Caribbean.ir'},
+  {brand:'Samsung',label:'Samsung Service Menu',file:'Samsung_Service_Menu.ir'},
+  {brand:'Samsung',label:'Samsung Smart Remote',file:'Samsung_Smart_Remote.ir'},
+  {brand:'Samsung',label:'Samsung TV',file:'Samsung_TV.ir'},
+  {brand:'Samsung',label:'Samsung TV Full',file:'Samsung_TV_Full.ir'},
+  {brand:'Samsung',label:'Samsung UE26C4000PW',file:'Samsung_UE26C4000PW.ir'},
+  {brand:'Samsung',label:'Samsung UE32F4000',file:'Samsung_UE32F4000.ir'},
+  {brand:'Samsung',label:'Samsung UE32F4000AW',file:'Samsung_UE32F4000AW.ir'},
+  {brand:'Samsung',label:'Samsung UE48JU6490U',file:'Samsung_UE48JU6490U.ir'},
+  {brand:'Samsung',label:'Samsung UE75TU7125K',file:'Samsung_UE75TU7125K.ir'},
+  {brand:'Samsung',label:'Samsung UN32EH5000F',file:'Samsung_UN32EH5000F.ir'},
+  {brand:'Samsung',label:'Samsung Unknown Model',file:'Samsung_Unknown_Model.ir'},
+  {brand:'Samsung',label:'SamsungTV',file:'SamsungTV.ir'},
+  {brand:'Sankey',label:'Sankey TV',file:'Sankey_TV.ir'},
+  {brand:'Sanyo',label:'Sanyo FW40R49FC',file:'Sanyo_FW40R49FC.ir'},
+  {brand:'Sceptre',label:'Sceptre 8142026670003C',file:'Sceptre_8142026670003C.ir'},
+  {brand:'Sceptre',label:'Sceptre H24',file:'Sceptre_H24.ir'},
+  {brand:'Sceptre',label:'Sceptre X50 Series',file:'Sceptre_X50_Series.ir'},
+  {brand:'Seiki',label:'Seiki SE40FYP1T TV',file:'Seiki_SE40FYP1T_TV.ir'},
+  {brand:'Sencor',label:'Sencor 25801',file:'Sencor_25801.ir'},
+  {brand:'Sharp',label:'Sharp 13VT L100',file:'Sharp_13VT-L100.ir'},
+  {brand:'Sharp',label:'Sharp Aquos 32BG3E',file:'Sharp_Aquos_32BG3E.ir'},
+  {brand:'Sharp',label:'Sharp Aquos JP',file:'Sharp_Aquos_JP.ir'},
+  {brand:'Sharp',label:'Sharp g0684cesa NES TV',file:'Sharp_g0684cesa_NES_TV.ir'},
+  {brand:'Sharp',label:'Sharp LC 42LB261U',file:'Sharp_LC-42LB261U.ir'},
+  {brand:'Sharp',label:'Sharp Roku TV',file:'Sharp_Roku_TV.ir'},
+  {brand:'Sharp',label:'Sharp tv',file:'Sharp_tv.ir'},
+  {brand:'Sharp',label:'Sharp TV2',file:'Sharp_TV2.ir'},
+  {brand:'SkyVue',label:'SkyVue',file:'SkyVue.ir'},
+  {brand:'Sony',label:'Sony Bravia',file:'Sony_Bravia.ir'},
+  {brand:'Sony',label:'Sony Bravia KD 55XF80xx 49XF80xx 43XF80xx',file:'Sony_Bravia_KD-55XF80xx-49XF80xx-43XF80xx.ir'},
+  {brand:'Sony',label:'Sony Bravia KDL 46W905A',file:'Sony_Bravia_KDL-46W905A.ir'},
+  {brand:'Sony',label:'Sony FW 75BZ40H',file:'Sony_FW_75BZ40H.ir'},
+  {brand:'Sony',label:'Sony KD',file:'Sony_KD.ir'},
+  {brand:'Sony',label:'Sony KD 55X80CK',file:'Sony_KD-55X80CK.ir'},
+  {brand:'Sony',label:'Sony KDL 55HX850',file:'Sony_KDL-55HX850.ir'},
+  {brand:'Sony',label:'Sony RM ED016',file:'Sony_RM_ED016.ir'},
+  {brand:'Sony',label:'Sony RM ED045',file:'Sony_RM_ED045.ir'},
+  {brand:'Sony',label:'Sony RM GD014',file:'Sony_RM-GD014.ir'},
+  {brand:'Sony',label:'Sony RM V310',file:'Sony_RM-V310.ir'},
+  {brand:'Sony',label:'Sony RM YD017',file:'Sony_RM-YD017.ir'},
+  {brand:'Sony',label:'Sony RM YD018',file:'Sony_RM-YD018.ir'},
+  {brand:'Sony',label:'Sony RMT TB400U',file:'Sony_RMT_TB400U.ir'},
+  {brand:'Sony',label:'Sony RMT TX100D',file:'Sony_RMT_TX100D.ir'},
+  {brand:'Sony',label:'Sony RMT TX200U',file:'Sony_RMT_TX200U.ir'},
+  {brand:'Sony',label:'Sony SFRTV5',file:'Sony_SFRTV5.ir'},
+  {brand:'Sony',label:'Sony X2182U',file:'Sony_X2182U.ir'},
+  {brand:'Sony',label:'Sony XBR',file:'Sony_XBR.ir'},
+  {brand:'Sony',label:'Sony XBR RM TD017',file:'Sony_XBR_RM-TD017.ir'},
+  {brand:'Sony',label:'Sony XBR RMT TX200U',file:'Sony_XBR_RMT-TX200U.ir'},
+  {brand:'Sony',label:'SonyTV',file:'SonyTV.ir'},
+  {brand:'Strong',label:'Strong 32HX4003',file:'Strong_32HX4003.ir'},
+  {brand:'Strong',label:'Strong RCU Z400N',file:'Strong_RCU-Z400N.ir'},
+  {brand:'Sunbrite',label:'Sunbrite',file:'Sunbrite.ir'},
+  {brand:'Supra',label:'Supra STV LC32T880WL 1',file:'Supra_STV_LC32T880WL_1.ir'},
+  {brand:'SWEEX',label:'SWEEX Generic Monitor',file:'SWEEX_Generic_Monitor.ir'},
+  {brand:'Symphonic',label:'Symphonic ST424FF',file:'Symphonic_ST424FF.ir'},
+  {brand:'TC',label:'TC 33 VNS2000',file:'TC_33_VNS2000.ir'},
+  {brand:'TCL',label:'TCL 32S327',file:'TCL_32S327.ir'},
+  {brand:'TCL',label:'TCL 43S446',file:'TCL_43S446.ir'},
+  {brand:'TCL',label:'TCL LED49D2930',file:'TCL_LED49D2930.ir'},
+  {brand:'TCL',label:'TCL Roku TV',file:'TCL_Roku_TV.ir'},
+  {brand:'TCL',label:'TCL ROKU US',file:'TCL_ROKU_US.ir'},
+  {brand:'TCL',label:'TCL UnknownModel1',file:'TCL_UnknownModel1.ir'},
+  {brand:'TCL',label:'TCL UnknownModel2',file:'TCL_UnknownModel2.ir'},
+  {brand:'TCL',label:'TCL UnknownModel3',file:'TCL_UnknownModel3.ir'},
+  {brand:'Telefunken',label:'Telefunken d32f660x5cwi',file:'Telefunken_d32f660x5cwi.ir'},
+  {brand:'Telefunken',label:'Telefunken D40F294R4CW',file:'Telefunken_D40F294R4CW.ir'},
+  {brand:'Telefunken',label:'Telefunken L55U405B4CW',file:'Telefunken_L55U405B4CW.ir'},
+  {brand:'Telefunken',label:'Telefunken L65F249i3C',file:'Telefunken_L65F249i3C.ir'},
+  {brand:'Telefunken',label:'Telefunken TF LED19S64T2',file:'Telefunken_TF-LED19S64T2.ir'},
+  {brand:'Telefunken',label:'Telefunken TF LED32S54T2',file:'Telefunken_TF-LED32S54T2.ir'},
+  {brand:'Telekom',label:'Telekom Entertain',file:'Telekom_Entertain.ir'},
+  {brand:'Thomson',label:'Thomson 40FS3003',file:'Thomson_40FS3003.ir'},
+  {brand:'Thomson',label:'Thomson UnknownModel1',file:'Thomson_UnknownModel1.ir'},
+  {brand:'Toshiba',label:'Toshiba 32AV502U',file:'Toshiba_32AV502U.ir'},
+  {brand:'Toshiba',label:'Toshiba 43LF421U21',file:'Toshiba_43LF421U21.ir'},
+  {brand:'Toshiba',label:'Toshiba 50C350LC',file:'Toshiba_50C350LC.ir'},
+  {brand:'Toshiba',label:'Toshiba CT 32F2',file:'Toshiba_CT-32F2.ir'},
+  {brand:'Toshiba',label:'Toshiba CT 90325',file:'Toshiba_CT-90325.ir'},
+  {brand:'Toshiba',label:'Toshiba CT 9922',file:'Toshiba_CT-9922.ir'},
+  {brand:'Toshiba',label:'Toshiba FireTV',file:'Toshiba_FireTV.ir'},
+  {brand:'Toshiba',label:'Toshiba SE R0305 32CV100U',file:'Toshiba_SE_R0305_32CV100U.ir'},
+  {brand:'United',label:'United tv',file:'United_tv.ir'},
+  {brand:'VIEWSONIC',label:'VIEWSONIC A 00010219',file:'VIEWSONIC_A-00010219.ir'},
+  {brand:'Viore',label:'Viore TV LC37VF72',file:'Viore_TV_LC37VF72.ir'},
+  {brand:'Vitec',label:'Vitec Exterity IPTV',file:'Vitec_Exterity_IPTV.ir'},
+  {brand:'Vizio',label:'Vizio',file:'Vizio.ir'},
+  {brand:'Vizio',label:'Vizio D32FM K01',file:'Vizio_D32FM-K01.ir'},
+  {brand:'Vizio',label:'Vizio D43 C1',file:'Vizio_D43-C1.ir'},
+  {brand:'Vizio',label:'Vizio E70U D3',file:'Vizio_E70U-D3.ir'},
+  {brand:'Vizio',label:'Vizio M70Q6 J03',file:'Vizio_M70Q6-J03.ir'},
+  {brand:'Vizio',label:'Vizio V705 G1',file:'Vizio_V705-G1.ir'},
+  {brand:'Vizio',label:'Vizio XRT122',file:'Vizio_XRT122.ir'},
+  {brand:'Vizio',label:'Vizio XRT136',file:'Vizio_XRT136.ir'},
+  {brand:'Vizio',label:'Vizio XRT140R',file:'Vizio_XRT140R.ir'},
+  {brand:'WATSON',label:'WATSON FA3627T',file:'WATSON_FA3627T.ir'},
+  {brand:'Wbox',label:'Wbox TV',file:'Wbox_TV.ir'},
+  {brand:'Westinghouse',label:'Westinghouse',file:'Westinghouse.ir'},
+  {brand:'Westinghouse',label:'Westinghouse RMT 13',file:'Westinghouse_RMT-13.ir'},
+  {brand:'Zenith',label:'Zenith SC3492Z',file:'Zenith_SC3492Z.ir'},
+  {brand:'Zenith',label:'Zenith tv',file:'Zenith_tv.ir'},
+];
+
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+let filtered = [...ALL_REMOTES];
+let activeRemote = null;
 let macro = [];
 let dragSrc = null;
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════
-async function init() {
-  try {
-    const res = await fetch(REMOTES_JSON);
-    if (!res.ok) throw new Error('No se pudo cargar remotes.json');
-    const data = await res.json();
-    allRemotes = data.remotes;
-    filteredRemotes = [...allRemotes];
-    buildBrandFilter();
-    renderRemoteList();
-    document.getElementById('remoteCount').textContent = `${allRemotes.length} mandos`;
-  } catch(e) {
-    document.getElementById('remoteList').innerHTML =
-      `<div class="list-empty">⚠ Error cargando base de datos<br><span style="font-size:8px;">${e.message}</span></div>`;
-    document.getElementById('remoteCount').textContent = 'error';
-  }
-}
-
-// ═══════════════════════════════════════════
-// BRAND FILTER
-// ═══════════════════════════════════════════
-function buildBrandFilter() {
-  const brands = [...new Set(allRemotes.map(r => r.brand))].sort();
-  const container = document.getElementById('brandFilter');
-  container.innerHTML = '';
-
-  const all = document.createElement('div');
-  all.className = 'brand-chip all-chip active';
-  all.textContent = 'ALL';
-  all.onclick = () => setBrand('ALL');
-  container.appendChild(all);
-
+// ═══════════════════════════════════════════════════════
+function init() {
+  // Poblar dropdown de marcas
+  const brands = [...new Set(ALL_REMOTES.map(r => r.brand))].sort();
+  const sel = document.getElementById('brandSelect');
   brands.forEach(b => {
-    const chip = document.createElement('div');
-    chip.className = 'brand-chip';
-    chip.textContent = b;
-    chip.dataset.brand = b;
-    chip.onclick = () => setBrand(b);
-    container.appendChild(chip);
+    const o = document.createElement('option');
+    o.value = b; o.textContent = b;
+    sel.appendChild(o);
   });
+
+  document.getElementById('totalCount').textContent = `${ALL_REMOTES.length} mandos`;
+  applyFilters();
 }
 
-function setBrand(brand) {
-  activeBrand = brand;
-  document.querySelectorAll('.brand-chip').forEach(c => {
-    c.classList.remove('active');
-    if (brand === 'ALL' && c.classList.contains('all-chip')) c.classList.add('active');
-    if (c.dataset.brand === brand) c.classList.add('active');
-  });
-  filterRemotes();
-}
-
-// ═══════════════════════════════════════════
-// FILTER + RENDER REMOTE LIST
-// ═══════════════════════════════════════════
-function filterRemotes() {
+// ═══════════════════════════════════════════════════════
+// FILTROS
+// ═══════════════════════════════════════════════════════
+function applyFilters() {
+  const brand = document.getElementById('brandSelect').value;
   const q = document.getElementById('searchBox').value.toLowerCase().trim();
-  filteredRemotes = allRemotes.filter(r => {
-    const matchBrand = activeBrand === 'ALL' || r.brand === activeBrand;
-    const matchQ = !q || r.name.toLowerCase().includes(q) || r.brand.toLowerCase().includes(q) || r.file.toLowerCase().includes(q);
-    return matchBrand && matchQ;
+
+  filtered = ALL_REMOTES.filter(r => {
+    const okBrand = !brand || r.brand === brand;
+    const okQ = !q || r.label.toLowerCase().includes(q) || r.brand.toLowerCase().includes(q) || r.file.toLowerCase().includes(q);
+    return okBrand && okQ;
   });
-  renderRemoteList();
+
+  renderList();
 }
 
-function renderRemoteList() {
+// ═══════════════════════════════════════════════════════
+// RENDERIZAR LISTA
+// ═══════════════════════════════════════════════════════
+function renderList() {
   const list = document.getElementById('remoteList');
+  const status = document.getElementById('listStatus');
+  const count = document.getElementById('listCount');
+
   list.innerHTML = '';
-  if (!filteredRemotes.length) {
+
+  if (!filtered.length) {
     list.innerHTML = '<div class="list-empty">// Sin resultados</div>';
+    status.textContent = 'Sin resultados';
+    count.textContent = '';
     return;
   }
-  filteredRemotes.forEach(remote => {
-    const card = document.createElement('div');
-    card.className = 'remote-card' + (selectedRemote && selectedRemote.file === remote.file ? ' selected' : '');
-    card.innerHTML = `<div class="rc-brand">${remote.brand}</div><div class="rc-name">${remote.name}</div>`;
-    card.onclick = () => selectRemote(remote, card);
-    list.appendChild(card);
+
+  status.textContent = 'Selecciona un mando';
+  count.textContent = `${filtered.length} de ${ALL_REMOTES.length}`;
+
+  filtered.forEach(remote => {
+    const item = document.createElement('div');
+    item.className = 'remote-item' + (activeRemote && activeRemote.file === remote.file ? ' active' : '');
+    item.innerHTML = `
+      <span class="ri-brand">${remote.brand}</span>
+      <span class="ri-label">${remote.label}</span>
+    `;
+    item.onclick = () => selectRemote(remote);
+    list.appendChild(item);
   });
+
+  // Scroll al activo si existe
+  const activeEl = list.querySelector('.active');
+  if (activeEl) activeEl.scrollIntoView({block:'nearest'});
 }
 
-// ═══════════════════════════════════════════
-// SELECT + LOAD .IR FILE
-// ═══════════════════════════════════════════
-async function selectRemote(remote, card) {
-  document.querySelectorAll('.remote-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-  selectedRemote = remote;
+// ═══════════════════════════════════════════════════════
+// SELECCIONAR MANDO → CARGAR .IR
+// ═══════════════════════════════════════════════════════
+async function selectRemote(remote) {
+  activeRemote = remote;
+  renderList(); // actualizar selección visual
 
-  document.getElementById('selectedRemoteName').textContent = remote.name;
-  document.getElementById('signalSections').innerHTML =
-    '<div style="padding:16px;text-align:center;color:var(--muted);font-size:9px;"><span class="spinner"></span>Cargando señales...</div>';
-  document.getElementById('signalPanel').style.display = 'block';
-  document.getElementById('emptySignalPanel').style.display = 'none';
+  const grid = document.getElementById('signalGrid');
+  const sigCount = document.getElementById('sigCount');
+  grid.innerHTML = '<div class="list-empty"><span class="spinner"></span> Cargando señales...</div>';
+  sigCount.textContent = 'cargando...';
 
   try {
-    // URL-encode filename for spaces/special chars
-    const encodedFile = remote.file.split('/').map(p => encodeURIComponent(p)).join('/');
-    const url = `${REPO_BASE}/${encodedFile}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    loadedSignals = parseIR(text);
-    renderSignalSections(loadedSignals, remote.brand);
-    document.getElementById('sigCount').textContent = `${loadedSignals.length} botones`;
-    showToast(`${loadedSignals.length} señales cargadas`);
+    // Intenta primero ruta relativa (GitHub Pages, mismo repo)
+    // Si falla, intenta raw.githubusercontent.com como fallback
+    const FALLBACK_BASE = 'https://raw.githubusercontent.com/roberttsOS/roberttsOS.github.io/main/ir-macro-builder/remotes_ir';
+
+    const tryFetch = async (base) => {
+      // Codifica solo los caracteres problemáticos, preservando el nombre del archivo
+      const safeName = remote.file.replace(/ /g, '%20').replace(/'/g, '%27');
+      const url = `${base}/${safeName}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    };
+
+    let text;
+    try {
+      text = await tryFetch(RAW_BASE);
+    } catch(e1) {
+      // Fallback a raw.githubusercontent.com
+      text = await tryFetch(FALLBACK_BASE);
+    }
+
+    const signals = parseIR(text);
+    if (!signals.length) throw new Error('Sin señales parseables en el archivo');
+
+    renderSignalButtons(signals, remote.brand);
+    sigCount.textContent = `${signals.length} botones — ${remote.label}`;
+    showToast(`✓ ${signals.length} señales · ${remote.label}`);
   } catch(e) {
-    document.getElementById('signalSections').innerHTML =
-      `<div style="padding:16px;text-align:center;color:var(--danger);font-size:9px;">⚠ Error: ${e.message}</div>`;
+    grid.innerHTML = `<div class="list-empty" style="color:var(--danger);">⚠ Error al cargar: ${e.message}<br><span style="font-size:8px;color:var(--muted);">Archivo: ${remote.file}</span></div>`;
+    sigCount.textContent = 'error al cargar';
   }
 }
 
-// ═══════════════════════════════════════════
-// PARSE .IR FILE
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// PARSER .IR
+// ═══════════════════════════════════════════════════════
 function parseIR(text) {
   const signals = [];
-  const lines = text.split('\n');
-  let cur = {};
-  for (let line of lines) {
-    line = line.trim();
+  let cur = null;
+
+  for (let raw of text.split('\n')) {
+    const line = raw.trim();
     if (!line || line.startsWith('#')) continue;
     if (line.startsWith('Filetype:') || line.startsWith('Version:')) continue;
 
     if (line.startsWith('name:')) {
-      if (cur.name) signals.push({...cur});
+      if (cur && cur.name) signals.push(cur);
       cur = { name: line.slice(5).trim() };
-    } else if (line.startsWith('type:')) {
-      cur.type = line.slice(5).trim();
-    } else if (line.startsWith('protocol:')) {
-      cur.protocol = line.slice(9).trim();
-    } else if (line.startsWith('address:')) {
-      // Take first hex token
-      const tok = line.slice(8).trim().split(/\s+/)[0];
-      cur.address = tok;
-    } else if (line.startsWith('command:')) {
-      const tok = line.slice(8).trim().split(/\s+/)[0];
-      cur.command = tok;
-    } else if (line.startsWith('data:')) {
-      cur.data = line.slice(5).trim(); // raw type
-    } else if (line.startsWith('frequency:')) {
-      cur.frequency = line.slice(10).trim();
-    } else if (line.startsWith('duty_cycle:')) {
-      cur.duty_cycle = line.slice(11).trim();
+    } else if (cur) {
+      if (line.startsWith('type:'))        cur.type = line.slice(5).trim();
+      else if (line.startsWith('protocol:')) cur.protocol = line.slice(9).trim();
+      else if (line.startsWith('address:')) cur.address = line.slice(8).trim().split(/\s+/)[0];
+      else if (line.startsWith('command:')) cur.command = line.slice(8).trim().split(/\s+/)[0];
+      else if (line.startsWith('frequency:'))  cur.frequency = line.slice(10).trim();
+      else if (line.startsWith('duty_cycle:')) cur.duty_cycle = line.slice(11).trim();
+      else if (line.startsWith('data:'))    cur.data = line.slice(5).trim();
     }
   }
-  if (cur.name) signals.push({...cur});
+  if (cur && cur.name) signals.push(cur);
   return signals;
 }
 
-// ═══════════════════════════════════════════
-// RENDER SIGNAL BUTTONS
-// ═══════════════════════════════════════════
-const ICON_MAP = {
-  power:['⏻','power','standby','on_off'],
-  up:['↑','up','arrow_up','cursor_up','ch+','channel_up','vol+','volume_up'],
-  down:['↓','down','arrow_down','cursor_down','ch-','channel_down','vol-','volume_down'],
-  left:['←','left','arrow_left','cursor_left','prev','previous','rewind'],
-  right:['→','right','arrow_right','cursor_right','next','forward','fast_forward'],
-  ok:['✓','ok','enter','select','confirm','center'],
-  back:['⬅','back','return','exit','esc','cancel'],
-  menu:['☰','menu','home','main_menu','home_menu'],
-  mute:['🔇','mute','audio_mute'],
-  play:['▶','play','play_pause'],
-  pause:['⏸','pause'],
-  stop:['⏹','stop'],
-  rec:['⏺','record','rec'],
-  source:['⊙','source','input','hdmi','av'],
-  info:['ℹ','info','display','guide'],
-};
+// ═══════════════════════════════════════════════════════
+// ICONOS
+// ═══════════════════════════════════════════════════════
+const ICONS = [
+  [['power','standby','on_off','pwr'],         '⏻'],
+  [['vol_up','volume_up','vol+'],               '🔊'],
+  [['vol_down','volume_down','vol-','vol_dn'],  '🔉'],
+  [['mute','audio_mute'],                       '🔇'],
+  [['ch_up','channel_up','ch+','prg+'],         '🔼'],
+  [['ch_down','channel_down','ch-','prg-'],      '🔽'],
+  [['up','arrow_up','cursor_up','dpad_up'],     '↑'],
+  [['down','arrow_down','cursor_down','dpad_dn'],'↓'],
+  [['left','arrow_left','cursor_left','dpad_l'],'←'],
+  [['right','arrow_right','cursor_right','dpad_r'],'→'],
+  [['ok','enter','select','confirm','center'],  '✓'],
+  [['back','return','exit','esc','cancel'],     '⬅'],
+  [['menu','home','main_menu','home_menu'],     '☰'],
+  [['play','play_pause'],                       '▶'],
+  [['pause'],                                   '⏸'],
+  [['stop'],                                    '⏹'],
+  [['record','rec'],                            '⏺'],
+  [['prev','previous','rewind','rew'],          '⏮'],
+  [['next','fwd','fast_fwd','skip'],            '⏭'],
+  [['source','input','hdmi','av'],              '⊙'],
+  [['info','display','guide'],                  '🛈'],
+  [['0'],                                       '0'],
+  [['1'],                                       '1'],
+  [['2'],                                       '2'],
+  [['3'],                                       '3'],
+  [['4'],                                       '4'],
+  [['5'],                                       '5'],
+  [['6'],                                       '6'],
+  [['7'],                                       '7'],
+  [['8'],                                       '8'],
+  [['9'],                                       '9'],
+];
 
 function getIcon(name) {
-  const nl = name.toLowerCase().replace(/[^a-z0-9]/g,'_');
-  for (const [icon, keys] of Object.entries(ICON_MAP)) {
-    if (keys.some(k => nl.includes(k.replace(/[^a-z0-9]/g,'_')))) return icon;
+  const n = name.toLowerCase().replace(/[\s\-\/]/g,'_');
+  for (const [keys, icon] of ICONS) {
+    if (keys.some(k => n === k || n.endsWith('_'+k) || n.startsWith(k+'_') || n.includes('_'+k+'_'))) return icon;
   }
   return '▸';
 }
 
-function renderSignalSections(signals, brand) {
-  const container = document.getElementById('signalSections');
-  container.innerHTML = '';
-  if (!signals.length) {
-    container.innerHTML = '<div style="padding:12px;text-align:center;font-size:9px;color:var(--muted);">Sin señales en este archivo</div>';
-    return;
-  }
+// ═══════════════════════════════════════════════════════
+// RENDER SIGNAL BUTTONS
+// ═══════════════════════════════════════════════════════
+function renderSignalButtons(signals, brand) {
+  const grid = document.getElementById('signalGrid');
+  grid.innerHTML = '';
 
-  // Single flat grid — most .ir files have their own grouping in the name
-  const grid = document.createElement('div');
-  grid.className = 'sig-grid';
+  const wrap = document.createElement('div');
+  wrap.className = 'sig-grid';
 
   signals.forEach(sig => {
     const btn = document.createElement('button');
     btn.className = 'sig-btn';
     const icon = getIcon(sig.name);
-    btn.innerHTML = `<span class="sig-icon">${icon}</span>${sig.name}`;
-    btn.title = `${sig.protocol || sig.type || 'raw'} | addr:${sig.address || '-'} cmd:${sig.command || '-'}`;
+    btn.innerHTML = `<span class="sig-icon">${icon}</span><span class="sig-name">${sig.name}</span>`;
+    btn.title = `${sig.protocol || sig.type || '?'} | addr:${sig.address||'-'} cmd:${sig.command||'-'}`;
     btn.onclick = () => addSignal(sig, brand);
-    grid.appendChild(btn);
+    wrap.appendChild(btn);
   });
 
-  container.appendChild(grid);
+  grid.appendChild(wrap);
 }
 
-// ═══════════════════════════════════════════
-// MACRO OPERATIONS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// MACRO OPERACIONES
+// ═══════════════════════════════════════════════════════
 function addSignal(sig, brand) {
   const delay = parseInt(document.getElementById('globalDelay').value) || 200;
-  macro.push({
-    ...sig,
-    brand: brand || selectedRemote?.brand || '?',
-    delay,
-    id: Date.now() + Math.random()
-  });
-  render();
+  macro.push({ ...sig, brand: brand || '?', delay, id: Date.now() + Math.random() });
+  renderMacro();
   showToast(`+ ${sig.name}`);
 }
 
-function clearMacro() { macro = []; render(); }
+function clearMacro() { macro = []; renderMacro(); }
 
 function duplicateLast() {
   if (!macro.length) return;
-  macro.push({...macro[macro.length-1], id: Date.now()+Math.random()});
-  render();
+  macro.push({ ...macro[macro.length-1], id: Date.now()+Math.random() });
+  renderMacro();
 }
 
-function removeItem(idx) { macro.splice(idx,1); render(); }
+function removeItem(idx) { macro.splice(idx,1); renderMacro(); }
 
-// ═══════════════════════════════════════════
-// RENDER MACRO LIST
-// ═══════════════════════════════════════════
-function render() {
+// ═══════════════════════════════════════════════════════
+// RENDER MACRO
+// ═══════════════════════════════════════════════════════
+function renderMacro() {
   const list = document.getElementById('macroList');
   list.innerHTML = '';
+
   if (!macro.length) {
-    list.innerHTML = '<div class="macro-empty">// Selecciona un mando y pulsa<br>sus botones para añadirlos</div>';
+    list.innerHTML = '<div class="macro-empty">// Añade señales desde el panel izquierdo</div>';
   } else {
     macro.forEach((item, i) => {
       const el = document.createElement('div');
       el.className = 'macro-item';
       el.draggable = true;
-      el.dataset.idx = i;
       el.innerHTML = `
         <span class="dh">⠿</span>
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
@@ -605,37 +881,38 @@ function render() {
         <span class="item-name">${item.name}</span>
         <input class="delay-inp" type="number" value="${item.delay}" min="0" max="9999"
           oninput="macro[${i}].delay=parseInt(this.value)||0;updateStats();generateCode();" />
-        <span class="ms-label">ms</span>
+        <span class="ms-lbl">ms</span>
         <button class="rm-btn" onclick="removeItem(${i})">✕</button>
       `;
       el.addEventListener('dragstart', () => { dragSrc=i; el.classList.add('dragging'); });
-      el.addEventListener('dragend', () => { el.classList.remove('dragging'); document.querySelectorAll('.macro-item').forEach(x=>x.classList.remove('drag-over')); });
-      el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+      el.addEventListener('dragend',   () => { el.classList.remove('dragging'); document.querySelectorAll('.macro-item').forEach(x=>x.classList.remove('drag-over')); });
+      el.addEventListener('dragover',  e => { e.preventDefault(); el.classList.add('drag-over'); });
       el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
       el.addEventListener('drop', e => {
         e.preventDefault();
         if (dragSrc !== null && dragSrc !== i) {
           const moved = macro.splice(dragSrc,1)[0];
           macro.splice(i,0,moved);
-          render();
+          renderMacro();
         }
       });
       list.appendChild(el);
     });
   }
+
   updateStats();
   updatePreview();
   generateCode();
 }
 
 function updateStats() {
-  const count = macro.length;
-  const time = macro.reduce((s,x)=>s+(x.delay||0),0);
+  const n = macro.length;
+  const t = macro.reduce((s,x)=>s+(x.delay||0),0);
   const sz = generateIR().length;
-  document.getElementById('statCount').textContent = count;
-  document.getElementById('statTime').textContent = time>=1000?(time/1000).toFixed(1)+'s':time+'ms';
+  document.getElementById('statCount').textContent = n;
+  document.getElementById('statTime').textContent = t>=1000?(t/1000).toFixed(1)+'s':t+'ms';
   document.getElementById('statSize').textContent = sz<1024?sz+'B':(sz/1024).toFixed(1)+'KB';
-  document.getElementById('itemCount').textContent = count+' señal'+(count!==1?'es':'');
+  document.getElementById('itemCount').textContent = n+' señal'+(n!==1?'es':'');
 }
 
 function updatePreview() {
@@ -657,53 +934,47 @@ function updatePreview() {
   }
 }
 
-// ═══════════════════════════════════════════
-// GENERATE .IR
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// GENERAR .IR
+// ═══════════════════════════════════════════════════════
 function generateIR() {
   if (!macro.length) return '// Añade señales para generar el archivo';
   const name = (document.getElementById('macroName').value||'My_Macro').replace(/\s/g,'_');
-  const repeats = parseInt(document.getElementById('repeatCount').value)||1;
-  let lines = [
-    'Filetype: IR signals file',
-    'Version: 1',
-    '#',
+  const reps = parseInt(document.getElementById('repeatCount').value)||1;
+  const lines = [
+    'Filetype: IR signals file','Version: 1','#',
     `# Macro: ${name}`,
     `# Generado por Flipper IR Macro Builder v2`,
-    `# robertts-s.github.io/ir-macro-builder`,
-    `# Señales: ${macro.length} | Repeticiones: ${repeats}`,
-    '#',
-    ''
+    `# roberttsOS.github.io/ir-macro-builder`,
+    `# Señales: ${macro.length} | Repeticiones: ${reps}`,
+    '#',''
   ];
-  macro.forEach((item, i) => {
-    const label = `${name}_${String(i+1).padStart(2,'0')}_${item.name.replace(/[\s\(\)]/g,'_')}`;
-    if (item.type === 'raw') {
-      lines.push(`name: ${label}`);
-      lines.push(`type: raw`);
+  macro.forEach((item,i) => {
+    const lbl = `${name}_${String(i+1).padStart(2,'0')}_${item.name.replace(/[\s\(\)\/\\]/g,'_')}`;
+    if (item.type==='raw') {
+      lines.push(`name: ${lbl}`,'type: raw');
       if (item.frequency) lines.push(`frequency: ${item.frequency}`);
       if (item.duty_cycle) lines.push(`duty_cycle: ${item.duty_cycle}`);
       if (item.data) lines.push(`data: ${item.data}`);
-      lines.push('');
     } else {
-      lines.push(`name: ${label}`);
-      lines.push(`type: parsed`);
-      lines.push(`protocol: ${item.protocol||'NEC'}`);
-      lines.push(`address: ${item.address||'0x00'} 00 00 00`);
-      lines.push(`command: ${item.command||'0x00'} 00 00 00`);
-      lines.push('');
+      lines.push(`name: ${lbl}`,'type: parsed',
+        `protocol: ${item.protocol||'NEC'}`,
+        `address: ${item.address||'0x00'} 00 00 00`,
+        `command: ${item.command||'0x00'} 00 00 00`);
     }
+    lines.push('');
   });
   return lines.join('\n');
 }
 
-// ═══════════════════════════════════════════
-// GENERATE C
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// GENERAR C
+// ═══════════════════════════════════════════════════════
 function generateC() {
   if (!macro.length) return '// Añade señales para generar el código C';
   const name = (document.getElementById('macroName').value||'My_Macro').replace(/\s/g,'_');
-  const repeats = parseInt(document.getElementById('repeatCount').value)||1;
-  const structs = macro.map((item,i) => {
+  const reps = parseInt(document.getElementById('repeatCount').value)||1;
+  const structs = macro.map(item => {
     const addr = parseInt(item.address)||0;
     const cmd  = parseInt(item.command)||0;
     const proto = (item.protocol||'NEC').replace(/[^A-Za-z0-9]/g,'');
@@ -713,8 +984,7 @@ function generateC() {
   return `/**
  * IR Macro: ${name}
  * Generado por Flipper IR Macro Builder v2
- * robertts-s.github.io/ir-macro-builder
- * Señales: ${macro.length} | Repeticiones: ${repeats}
+ * Señales: ${macro.length} | Repeticiones: ${reps}
  */
 #include <furi.h>
 #include <furi_hal.h>
@@ -729,14 +999,11 @@ function generateC() {
 
 #define TAG "IrMacro"
 #define MACRO_NAME "${name}"
-#define MACRO_REPEATS ${repeats}
+#define MACRO_REPEATS ${reps}
 
 typedef struct {
-    const char*      name;
-    InfraredProtocol protocol;
-    uint32_t         address;
-    uint32_t         command;
-    uint32_t         delay_ms;
+    const char* name; InfraredProtocol protocol;
+    uint32_t address, command, delay_ms;
 } IrSignal;
 
 static const IrSignal macro_signals[] = {
@@ -752,33 +1019,33 @@ typedef struct {
 } App;
 
 static void send_signal(const IrSignal* s) {
-    InfraredMessage m = { .protocol=s->protocol, .address=s->address, .command=s->command, .repeat=false };
-    infrared_send(&m, 1);
+    InfraredMessage m={.protocol=s->protocol,.address=s->address,.command=s->command,.repeat=false};
+    infrared_send(&m,1);
     furi_delay_ms(s->delay_ms);
 }
 
 static int32_t macro_thread(void* ctx) {
-    App* app = ctx;
-    for(int r=0;r<MACRO_REPEATS;r++) {
-        app->repeat_n = r+1;
-        for(size_t i=0;i<SIGNAL_COUNT;i++) {
+    App* app=ctx;
+    for(int r=0;r<MACRO_REPEATS;r++){
+        app->repeat_n=r+1;
+        for(size_t i=0;i<SIGNAL_COUNT;i++){
             furi_mutex_acquire(app->mutex,FuriWaitForever);
-            app->current = i;
+            app->current=i;
             furi_mutex_release(app->mutex);
             view_port_update(app->viewport);
             send_signal(&macro_signals[i]);
         }
     }
     furi_mutex_acquire(app->mutex,FuriWaitForever);
-    app->state = STATE_DONE;
+    app->state=STATE_DONE;
     furi_mutex_release(app->mutex);
-    notification_message(app->notif, &sequence_success);
+    notification_message(app->notif,&sequence_success);
     view_port_update(app->viewport);
     return 0;
 }
 
-static void render_cb(Canvas* canvas, void* ctx) {
-    App* app = ctx;
+static void render_cb(Canvas* canvas,void* ctx){
+    App* app=ctx;
     furi_mutex_acquire(app->mutex,FuriWaitForever);
     canvas_clear(canvas);
     canvas_set_font(canvas,FontPrimary);
@@ -786,31 +1053,29 @@ static void render_cb(Canvas* canvas, void* ctx) {
     canvas_set_font(canvas,FontSecondary);
     canvas_draw_str(canvas,2,20,MACRO_NAME);
     char buf[48];
-    if(app->state==STATE_IDLE) {
+    if(app->state==STATE_IDLE){
         canvas_draw_str(canvas,2,34,"Pulsa OK para ejecutar");
         snprintf(buf,sizeof(buf),"%zu senales x%d",SIGNAL_COUNT,MACRO_REPEATS);
         canvas_draw_str(canvas,2,44,buf);
-    } else if(app->state==STATE_RUNNING) {
-        snprintf(buf,sizeof(buf),"[%zu/%zu] %s",app->current+1,SIGNAL_COUNT,macro_signals[app->current].name);
+    }else if(app->state==STATE_RUNNING){
         canvas_draw_str(canvas,2,34,"Enviando...");
+        snprintf(buf,sizeof(buf),"[%zu/%zu] %s",app->current+1,SIGNAL_COUNT,macro_signals[app->current].name);
         canvas_draw_str(canvas,2,44,buf);
         int p=(int)((app->current+1)*120/SIGNAL_COUNT);
         canvas_draw_frame(canvas,2,52,124,7);
         canvas_draw_box(canvas,3,53,p,5);
-    } else {
+    }else{
         canvas_draw_str(canvas,2,34,"Completado!");
-        canvas_draw_str(canvas,2,44,"OK para repetir | Back para salir");
+        canvas_draw_str(canvas,2,44,"OK=repetir  Back=salir");
     }
     furi_mutex_release(app->mutex);
 }
 
-static void input_cb(InputEvent* e, void* ctx) {
-    furi_message_queue_put((FuriMessageQueue*)ctx,e,FuriWaitForever);
-}
+static void input_cb(InputEvent* e,void* ctx){furi_message_queue_put((FuriMessageQueue*)ctx,e,FuriWaitForever);}
 
-int32_t ir_macro_app(void* p) {
+int32_t ir_macro_app(void* p){
     UNUSED(p);
-    App* app = malloc(sizeof(App));
+    App* app=malloc(sizeof(App));
     memset(app,0,sizeof(App));
     app->state=STATE_IDLE;
     app->mutex=furi_mutex_alloc(FuriMutexTypeNormal);
@@ -822,14 +1087,14 @@ int32_t ir_macro_app(void* p) {
     view_port_input_callback_set(app->viewport,input_cb,app->queue);
     gui_add_view_port(app->gui,app->viewport,GuiLayerFullscreen);
     InputEvent ev; FuriThread* th=NULL; bool run=true;
-    while(run) {
-        if(furi_message_queue_get(app->queue,&ev,100)==FuriStatusOk && ev.type==InputTypeShort) {
-            if(ev.key==InputKeyOk && app->state!=STATE_RUNNING) {
-                app->state=STATE_RUNNING; app->current=0; app->repeat_n=1;
+    while(run){
+        if(furi_message_queue_get(app->queue,&ev,100)==FuriStatusOk&&ev.type==InputTypeShort){
+            if(ev.key==InputKeyOk&&app->state!=STATE_RUNNING){
+                app->state=STATE_RUNNING;app->current=0;app->repeat_n=1;
                 if(th){furi_thread_join(th);furi_thread_free(th);}
                 th=furi_thread_alloc_ex("MacroTh",2048,macro_thread,app);
                 furi_thread_start(th);
-            } else if(ev.key==InputKeyBack && app->state!=STATE_RUNNING) run=false;
+            }else if(ev.key==InputKeyBack&&app->state!=STATE_RUNNING)run=false;
         }
         view_port_update(app->viewport);
     }
@@ -846,61 +1111,45 @@ int32_t ir_macro_app(void* p) {
 `;
 }
 
-// ═══════════════════════════════════════════
-// CODE PANEL
-// ═══════════════════════════════════════════
-function generateCode() {
-  document.getElementById('code-ir').textContent = generateIR();
-  document.getElementById('code-c').textContent = generateC();
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function generateCode(){
+  document.getElementById('code-ir').textContent=generateIR();
+  document.getElementById('code-c').textContent=generateC();
 }
 
-// ═══════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════
-function switchTab(id) {
-  const ids = ['ir','c','guide'];
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ids[i]===id));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+function switchTab(id){
+  const ids=['ir','c','guide'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===id));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
 }
 
-// ═══════════════════════════════════════════
-// COPY / DOWNLOAD
-// ═══════════════════════════════════════════
-function copyTab(type, btn) {
+function copyTab(type,btn){
   navigator.clipboard.writeText(document.getElementById('code-'+type).textContent).then(()=>{
-    btn.textContent='✓ OK'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='COPIAR'; btn.classList.remove('copied'); },2000);
+    btn.textContent='✓ OK';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPIAR';btn.classList.remove('copied');},2000);
   });
 }
 
-function downloadFile(type) {
-  const name = (document.getElementById('macroName').value||'My_Macro').replace(/\s/g,'_');
-  const content = type==='ir' ? generateIR() : generateC();
-  const filename = type==='ir' ? name+'.ir' : 'ir_macro.c';
-  const mime = type==='ir' ? 'text/plain' : 'text/x-csrc';
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
-  a.download = filename;
-  a.click();
+function downloadFile(type){
+  const name=(document.getElementById('macroName').value||'My_Macro').replace(/\s/g,'_');
+  const content=type==='ir'?generateIR():generateC();
+  const filename=type==='ir'?name+'.ir':'ir_macro.c';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'}));
+  a.download=filename;a.click();
   showToast('Descargando '+filename);
 }
 
-// ═══════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1600);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
 }
 
-// ═══════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════
 init();
 </script>
 </body>
 </html>
-HTMLEOF
-echo "index.html written — $(wc -c < /mnt/user-data/outputs/index.html) bytes"
