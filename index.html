@@ -233,8 +233,12 @@ body::before{
   width:56px;height:56px;border:1px solid rgba(0,255,157,0.3);
   background:linear-gradient(135deg,rgba(0,255,157,0.1),rgba(0,255,157,0.03));
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  font-family:var(--font-head);font-size:1.2rem;font-weight:900;color:var(--accent)
+  overflow:hidden;
+  box-shadow:0 0 16px rgba(0,255,157,0.08);
+  transition:border-color .2s,box-shadow .2s
 }
+.avatar img{width:100%;height:100%;display:block;object-fit:cover}
+.avatar:hover{border-color:rgba(0,255,157,.72);box-shadow:0 0 20px rgba(0,255,157,.22)}
 .about-id{display:flex;flex-direction:column;gap:4px}
 .about-handle{
   font-family:var(--font-head);font-size:1.1rem;font-weight:900;
@@ -340,6 +344,11 @@ body::before{
 @media(max-width:600px){
   :root{ --bar-h:44px }
 
+  #desktop::after{
+    opacity:.72;
+    background-size:40px 40px
+  }
+
   /* Desktop icons: top-left */
   .d-icons{
     top:10px;bottom:auto;
@@ -356,7 +365,7 @@ body::before{
   .window:not(#win-about){
     position:fixed!important;
     top:0!important;left:0!important;
-    width:100vw!important;height:calc(100vh - var(--bar-h))!important;
+    width:100vw!important;height:calc(100dvh - var(--bar-h))!important;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     min-width:unset;min-height:unset
   }
@@ -368,7 +377,7 @@ body::before{
     width:calc(100vw - 24px)!important;
     max-width:360px!important;
     height:auto!important;
-    max-height:calc(100vh - var(--bar-h) - 40px)!important;
+    max-height:calc(100dvh - var(--bar-h) - 40px)!important;
     overflow-y:auto;
     min-width:unset;min-height:unset
   }
@@ -395,15 +404,47 @@ body::before{
   .projects-body{ padding:12px }
 
   /* Flipper iframe taller on mobile */
-  .flipper-iframe{ height:calc(100vh - var(--bar-h) - 38px) }
+  .flipper-iframe{ height:calc(100dvh - var(--bar-h) - 38px) }
 
   /* Boot log smaller */
   .boot-log{ font-size:0.58rem }
   .boot-logo{ letter-spacing:2px }
 }
+
+/* Animated logo wallpaper */
+#logo-wallpaper{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100dvh;
+  pointer-events:none;
+  background:#02060a
+}
+#desktop{
+  position:relative;
+  z-index:1;
+  background:transparent
+}
+#desktop::after{
+  opacity:1;
+  background-image:
+    linear-gradient(rgba(0,255,157,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,157,.045) 1px,transparent 1px)
+}
+@media(max-width:600px){
+  #desktop::after{
+    opacity:.8;
+    background-size:40px 40px
+  }
+}
+#taskbar,#startmenu,.window{isolation:isolate}
+#boot{z-index:9999}
 </style>
 </head>
 <body>
+
+<canvas id="logo-wallpaper" aria-hidden="true"></canvas>
 
 <!-- BOOT -->
 <div id="boot">
@@ -557,7 +598,9 @@ body::before{
   <div class="win-body">
     <div class="about-body">
       <div class="about-top">
-        <div class="avatar">R</div>
+        <div class="avatar">
+          <img src="data:image/webp;base64,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" alt="Logo de robertts_">
+        </div>
         <div class="about-id">
           <div class="about-handle">robertts_</div>
           <div class="about-role">// security &amp; development</div>
@@ -1693,6 +1736,267 @@ document.addEventListener('keydown',e=>{
 const _ds=document.createElement('style');
 _ds.textContent='.window.maximized{border-radius:0!important}.tb-minimized{opacity:0.55;font-style:italic}';
 document.head.appendChild(_ds);
+</script>
+<script>
+(() => {
+  const canvas = document.getElementById('logo-wallpaper');
+  const ctx = canvas.getContext('2d');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const points = [
+    [-1.15,-.95],[-1.15,.62],[0,1.18],[1.15,.62],[1.15,-.95]
+  ];
+  const outline = [[0,1],[1,2],[2,3],[3,4]];
+  const inner = [
+    [[-1.15,-.95],[.38,-.18]],
+    [[1.15,-.95],[-.38,-.18]]
+  ];
+  const meltEdges = [[1,2],[2,3]];
+  const drops = [];
+  const fog = [];
+  const backgroundBits = [];
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let rotation = 0;
+  let last = performance.now();
+  let spawn = 0;
+  let isMobile = false;
+  let resizeFrame = 0;
+
+  function resizeWallpaper(){
+    isMobile = innerWidth <= 600;
+    dpr = Math.min(devicePixelRatio || 1,isMobile?1.8:1.35);
+    width = Math.round(window.visualViewport?.width || innerWidth);
+    height = Math.round(window.visualViewport?.height || innerHeight);
+    canvas.width = Math.round(width*dpr);
+    canvas.height = Math.round(height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    fog.length = 0;
+    backgroundBits.length = 0;
+    const fogCount=isMobile?16:18;
+    for(let i=0;i<fogCount;i++){
+      fog.push({
+        x:Math.random()*width,y:height*(.12+Math.random()*.76),
+        r:Math.min(width,height)*(.13+Math.random()*.22),
+        speed:2+Math.random()*5,phase:Math.random()*Math.PI*2,
+        alpha:.018+Math.random()*.034
+      });
+    }
+    for(let x=0;x<width;x+=(isMobile?36:32)){
+      backgroundBits.push({
+        x,y:Math.random()*height,speed:10+Math.random()*24,
+        char:Math.random()>.5?'1':'0',alpha:.008+Math.random()*.018
+      });
+    }
+  }
+
+  function project(point,depth){
+    const scale=isMobile
+      ? Math.min(width*.255,height*.135)
+      : Math.min(width,height)*.165;
+    const x=point[0]*scale;
+    const y=point[1]*scale;
+    const z=depth*scale;
+    const cy=Math.cos(rotation);
+    const sy=Math.sin(rotation);
+    const rx=x*cy-z*sy;
+    const rz=x*sy+z*cy;
+    const perspective=760/(760+rz);
+    const centerX=width*.5;
+    return {
+      x:centerX+rx*perspective,
+      y:height*(isMobile?.46:.43)+y*perspective,
+      z:rz,
+      perspective
+    };
+  }
+
+  function line(a,b,color,size,alpha,blur=12){
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    ctx.strokeStyle=color;
+    ctx.lineWidth=size;
+    ctx.lineCap='round';
+    ctx.shadowColor=color;
+    ctx.shadowBlur=blur;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.lineTo(b.x,b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function neonLine(a,b,alpha){
+    line(a,b,'#03251a',13,alpha*.27,17);
+    line(a,b,'#00a968',7,alpha*.40,16);
+    line(a,b,'#00ff9d',3.7,alpha,14);
+    line(a,b,'#c8ffe9',1,alpha,5);
+  }
+
+  function drawAtmosphere(dt,now){
+    const light=ctx.createRadialGradient(
+      width*.5,height*.44,0,
+      width*.5,height*.44,Math.min(width,height)*.40
+    );
+    light.addColorStop(0,'rgba(0,255,157,.105)');
+    light.addColorStop(.30,'rgba(0,180,112,.055)');
+    light.addColorStop(.58,'rgba(0,105,75,.028)');
+    light.addColorStop(1,'rgba(2,7,10,0)');
+    ctx.fillStyle=light;
+    ctx.fillRect(0,0,width,height);
+
+    const coreLight=ctx.createRadialGradient(
+      width*.5,height*.44,0,
+      width*.5,height*.44,Math.min(width,height)*.22
+    );
+    coreLight.addColorStop(0,'rgba(115,255,205,.06)');
+    coreLight.addColorStop(.48,'rgba(0,255,157,.03)');
+    coreLight.addColorStop(1,'rgba(0,255,157,0)');
+    ctx.fillStyle=coreLight;
+    ctx.fillRect(0,0,width,height);
+
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    for(const cloud of fog){
+      cloud.x+=cloud.speed*dt;
+      if(cloud.x-cloud.r>width)cloud.x=-cloud.r;
+      const fy=cloud.y+Math.sin(now*.00015+cloud.phase)*20;
+      const g=ctx.createRadialGradient(cloud.x,fy,0,cloud.x,fy,cloud.r);
+      g.addColorStop(0,`rgba(25,72,62,${cloud.alpha})`);
+      g.addColorStop(.5,`rgba(20,43,48,${cloud.alpha*.55})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;
+      ctx.fillRect(cloud.x-cloud.r,fy-cloud.r,cloud.r*2,cloud.r*2);
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.font='11px Share Tech Mono,monospace';
+    ctx.textAlign='center';
+    for(const bit of backgroundBits){
+      bit.y+=bit.speed*dt;
+      if(bit.y>height+20)bit.y=-20;
+      ctx.fillStyle=`rgba(0,255,157,${bit.alpha})`;
+      ctx.fillText(bit.char,bit.x,bit.y);
+    }
+    ctx.restore();
+  }
+
+  function drawLogo(){
+    const front=points.map(p=>project(p,.09));
+    const back=points.map(p=>project(p,-.09));
+    const innerFront=inner.map(s=>s.map(p=>project(p,.09)));
+    const innerBack=inner.map(s=>s.map(p=>project(p,-.09)));
+    for(let i=0;i<points.length;i++)line(back[i],front[i],'#123c30',1.8,.38,8);
+    for(const [a,b] of outline)line(back[a],back[b],'#071711',2,.64,8);
+    const sorted=outline.slice().sort((a,b)=>
+      (front[a[0]].z+front[a[1]].z)-(front[b[0]].z+front[b[1]].z)
+    );
+    for(const [a,b] of sorted){
+      const visibility=Math.max(.38,Math.min(1,front[a].perspective));
+      neonLine(front[a],front[b],visibility);
+    }
+    for(let i=0;i<inner.length;i++){
+      line(innerBack[i][0],innerBack[i][1],'#071711',2,.64,8);
+      line(innerBack[i][0],innerFront[i][0],'#123c30',1.5,.4,8);
+      line(innerBack[i][1],innerFront[i][1],'#123c30',1.5,.4,8);
+      neonLine(innerFront[i][0],innerFront[i][1],.96);
+    }
+  }
+
+  function meltOrigin(){
+    const edge=meltEdges[Math.floor(Math.random()*meltEdges.length)];
+    const t=Math.random();
+    const a=points[edge[0]];
+    const b=points[edge[1]];
+    return project([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],.09);
+  }
+
+  function addDrop(){
+    if(drops.length>=(isMobile?24:38))return;
+    const origin=meltOrigin();
+    const roll=Math.random();
+    let color='67,76,83';
+    if(roll>.3)color='48,82,76';
+    if(roll>.62)color='86,108,91';
+    if(roll>.88)color='91,112,126';
+    drops.push({
+      x:origin.x+(Math.random()-.5)*5,y:origin.y,
+      speed:8+Math.random()*15,drift:(Math.random()-.5)*5,
+      life:0,maxLife:2.4+Math.random()*2,hold:.16+Math.random()*.3,
+      size:11+Math.random()*6,radius:2.5+Math.random()*2.5,
+      char:Math.random()>.5?'1':'0',color
+    });
+  }
+
+  function drawDrops(dt){
+    for(let i=drops.length-1;i>=0;i--){
+      const drop=drops[i];
+      drop.life+=dt;
+      const falling=drop.life>drop.hold;
+      if(falling){
+        drop.y+=drop.speed*dt;
+        drop.x+=drop.drift*dt;
+        drop.speed+=31*dt;
+      }
+      const progress=drop.life/drop.maxLife;
+      if(progress>=1||drop.y>height+20){
+        drops.splice(i,1);
+        continue;
+      }
+      ctx.save();
+      if(!falling){
+        const growth=drop.life/drop.hold;
+        const radius=drop.radius*(.55+growth*.65);
+        ctx.fillStyle=`rgba(${drop.color},${.6+growth*.3})`;
+        ctx.shadowColor=`rgba(${drop.color},.85)`;
+        ctx.shadowBlur=9;
+        ctx.beginPath();
+        ctx.ellipse(drop.x,drop.y+radius*.35,radius,radius*1.25,0,0,Math.PI*2);
+        ctx.fill();
+      }else{
+        const reveal=Math.min(1,(drop.life-drop.hold)/.16);
+        const alpha=Math.sin(progress*Math.PI)*.82*reveal;
+        ctx.font=`bold ${drop.size}px Share Tech Mono,monospace`;
+        ctx.textAlign='center';
+        ctx.fillStyle=`rgba(${drop.color},${alpha})`;
+        ctx.shadowColor=`rgba(${drop.color},.8)`;
+        ctx.shadowBlur=7;
+        ctx.fillText(drop.char,drop.x,drop.y);
+      }
+      ctx.restore();
+    }
+  }
+
+  function frame(now){
+    const dt=Math.min((now-last)/1000,.04);
+    last=now;
+    if(!reducedMotion)rotation+=dt*.35;
+    ctx.clearRect(0,0,width,height);
+    ctx.fillStyle='#02060a';
+    ctx.fillRect(0,0,width,height);
+    drawAtmosphere(dt,now);
+    drawLogo();
+    if(!reducedMotion){
+      spawn+=dt*(isMobile?4.1:5.5);
+      while(spawn>=1){addDrop();spawn--;}
+      drawDrops(dt);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function queueWallpaperResize(){
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame=requestAnimationFrame(resizeWallpaper);
+  }
+
+  addEventListener('resize',queueWallpaperResize);
+  if(window.visualViewport){
+    visualViewport.addEventListener('resize',queueWallpaperResize);
+  }
+  resizeWallpaper();
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
