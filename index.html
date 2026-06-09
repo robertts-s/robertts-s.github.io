@@ -1739,8 +1739,21 @@ document.head.appendChild(_ds);
 </script>
 <script>
 (() => {
+  const avatarImage = document.querySelector('.avatar img');
+  if (avatarImage) {
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.type = 'image/webp';
+    favicon.href = avatarImage.src;
+    document.head.appendChild(favicon);
+  }
+
   const canvas = document.getElementById('logo-wallpaper');
   const ctx = canvas.getContext('2d');
+  const atmosphereCanvas = document.createElement('canvas');
+  const atmosphereCtx = atmosphereCanvas.getContext('2d');
+  const fogSprite = document.createElement('canvas');
+  const fogSpriteCtx = fogSprite.getContext('2d');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const points = [
     [-1.15,-.95],[-1.15,.62],[0,1.18],[1.15,.62],[1.15,-.95]
@@ -1762,15 +1775,57 @@ document.head.appendChild(_ds);
   let spawn = 0;
   let isMobile = false;
   let resizeFrame = 0;
+  let resizeTimer = 0;
+
+  function buildFogSprite(){
+    fogSprite.width=256;
+    fogSprite.height=256;
+    const g=fogSpriteCtx.createRadialGradient(128,128,0,128,128,128);
+    g.addColorStop(0,'rgba(25,72,62,1)');
+    g.addColorStop(.5,'rgba(20,43,48,.55)');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    fogSpriteCtx.clearRect(0,0,256,256);
+    fogSpriteCtx.fillStyle=g;
+    fogSpriteCtx.fillRect(0,0,256,256);
+  }
+
+  function buildAtmosphereLayer(){
+    atmosphereCanvas.width=Math.round(width*dpr);
+    atmosphereCanvas.height=Math.round(height*dpr);
+    atmosphereCtx.setTransform(dpr,0,0,dpr,0,0);
+    atmosphereCtx.clearRect(0,0,width,height);
+
+    const light=atmosphereCtx.createRadialGradient(
+      width*.5,height*.44,0,
+      width*.5,height*.44,Math.min(width,height)*.40
+    );
+    light.addColorStop(0,'rgba(0,255,157,.105)');
+    light.addColorStop(.30,'rgba(0,180,112,.055)');
+    light.addColorStop(.58,'rgba(0,105,75,.028)');
+    light.addColorStop(1,'rgba(2,7,10,0)');
+    atmosphereCtx.fillStyle=light;
+    atmosphereCtx.fillRect(0,0,width,height);
+
+    const core=atmosphereCtx.createRadialGradient(
+      width*.5,height*.44,0,
+      width*.5,height*.44,Math.min(width,height)*.22
+    );
+    core.addColorStop(0,'rgba(115,255,205,.06)');
+    core.addColorStop(.48,'rgba(0,255,157,.03)');
+    core.addColorStop(1,'rgba(0,255,157,0)');
+    atmosphereCtx.fillStyle=core;
+    atmosphereCtx.fillRect(0,0,width,height);
+  }
 
   function resizeWallpaper(){
     isMobile = innerWidth <= 600;
-    dpr = Math.min(devicePixelRatio || 1,isMobile?1.8:1.35);
+    dpr = Math.min(devicePixelRatio || 1,isMobile?1.5:1.35);
     width = Math.round(window.visualViewport?.width || innerWidth);
     height = Math.round(window.visualViewport?.height || innerHeight);
     canvas.width = Math.round(width*dpr);
     canvas.height = Math.round(height*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
+    buildAtmosphereLayer();
     fog.length = 0;
     backgroundBits.length = 0;
     const fogCount=isMobile?16:18;
@@ -1827,6 +1882,12 @@ document.head.appendChild(_ds);
   }
 
   function neonLine(a,b,alpha){
+    if(isMobile){
+      line(a,b,'#03251a',11,alpha*.25,12);
+      line(a,b,'#00ff9d',3.8,alpha,10);
+      line(a,b,'#c8ffe9',1,alpha,3);
+      return;
+    }
     line(a,b,'#03251a',13,alpha*.27,17);
     line(a,b,'#00a968',7,alpha*.40,16);
     line(a,b,'#00ff9d',3.7,alpha,14);
@@ -1834,26 +1895,7 @@ document.head.appendChild(_ds);
   }
 
   function drawAtmosphere(dt,now){
-    const light=ctx.createRadialGradient(
-      width*.5,height*.44,0,
-      width*.5,height*.44,Math.min(width,height)*.40
-    );
-    light.addColorStop(0,'rgba(0,255,157,.105)');
-    light.addColorStop(.30,'rgba(0,180,112,.055)');
-    light.addColorStop(.58,'rgba(0,105,75,.028)');
-    light.addColorStop(1,'rgba(2,7,10,0)');
-    ctx.fillStyle=light;
-    ctx.fillRect(0,0,width,height);
-
-    const coreLight=ctx.createRadialGradient(
-      width*.5,height*.44,0,
-      width*.5,height*.44,Math.min(width,height)*.22
-    );
-    coreLight.addColorStop(0,'rgba(115,255,205,.06)');
-    coreLight.addColorStop(.48,'rgba(0,255,157,.03)');
-    coreLight.addColorStop(1,'rgba(0,255,157,0)');
-    ctx.fillStyle=coreLight;
-    ctx.fillRect(0,0,width,height);
+    ctx.drawImage(atmosphereCanvas,0,0,width,height);
 
     ctx.save();
     ctx.globalCompositeOperation='screen';
@@ -1861,12 +1903,8 @@ document.head.appendChild(_ds);
       cloud.x+=cloud.speed*dt;
       if(cloud.x-cloud.r>width)cloud.x=-cloud.r;
       const fy=cloud.y+Math.sin(now*.00015+cloud.phase)*20;
-      const g=ctx.createRadialGradient(cloud.x,fy,0,cloud.x,fy,cloud.r);
-      g.addColorStop(0,`rgba(25,72,62,${cloud.alpha})`);
-      g.addColorStop(.5,`rgba(20,43,48,${cloud.alpha*.55})`);
-      g.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g;
-      ctx.fillRect(cloud.x-cloud.r,fy-cloud.r,cloud.r*2,cloud.r*2);
+      ctx.globalAlpha=cloud.alpha;
+      ctx.drawImage(fogSprite,cloud.x-cloud.r,fy-cloud.r,cloud.r*2,cloud.r*2);
     }
     ctx.restore();
 
@@ -1987,13 +2025,20 @@ document.head.appendChild(_ds);
 
   function queueWallpaperResize(){
     cancelAnimationFrame(resizeFrame);
-    resizeFrame=requestAnimationFrame(resizeWallpaper);
+    clearTimeout(resizeTimer);
+    resizeFrame=requestAnimationFrame(()=>{
+      resizeTimer=setTimeout(resizeWallpaper,100);
+    });
   }
 
   addEventListener('resize',queueWallpaperResize);
   if(window.visualViewport){
     visualViewport.addEventListener('resize',queueWallpaperResize);
   }
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden)last=performance.now();
+  });
+  buildFogSprite();
   resizeWallpaper();
   requestAnimationFrame(frame);
 })();
