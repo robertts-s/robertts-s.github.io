@@ -1815,6 +1815,13 @@ document.head.appendChild(_ds);
     core.addColorStop(1,'rgba(0,255,157,0)');
     atmosphereCtx.fillStyle=core;
     atmosphereCtx.fillRect(0,0,width,height);
+
+    atmosphereCtx.font='11px Share Tech Mono,monospace';
+    atmosphereCtx.textAlign='center';
+    for(const bit of backgroundBits){
+      atmosphereCtx.fillStyle=`rgba(0,255,157,${bit.alpha})`;
+      atmosphereCtx.fillText(bit.char,bit.x,bit.y);
+    }
   }
 
   function resizeWallpaper(){
@@ -1827,10 +1834,9 @@ document.head.appendChild(_ds);
     canvas.width = Math.round(width*dpr);
     canvas.height = Math.round(height*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    buildAtmosphereLayer();
     fog.length = 0;
     backgroundBits.length = 0;
-    const fogCount=isMobile?16:18;
+    const fogCount=isMobile?9:11;
     for(let i=0;i<fogCount;i++){
       fog.push({
         x:Math.random()*width,y:height*(.12+Math.random()*.76),
@@ -1841,10 +1847,11 @@ document.head.appendChild(_ds);
     }
     for(let x=0;x<width;x+=(isMobile?36:32)){
       backgroundBits.push({
-        x,y:Math.random()*height,speed:10+Math.random()*24,
+        x,y:Math.random()*height,
         char:Math.random()>.5?'1':'0',alpha:.008+Math.random()*.018
       });
     }
+    buildAtmosphereLayer();
   }
 
   function project(point,depth){
@@ -1874,8 +1881,10 @@ document.head.appendChild(_ds);
     ctx.strokeStyle=color;
     ctx.lineWidth=size;
     ctx.lineCap='round';
-    ctx.shadowColor=color;
-    ctx.shadowBlur=blur;
+    if(blur>0){
+      ctx.shadowColor=color;
+      ctx.shadowBlur=blur;
+    }
     ctx.beginPath();
     ctx.moveTo(a.x,a.y);
     ctx.lineTo(b.x,b.y);
@@ -1884,9 +1893,9 @@ document.head.appendChild(_ds);
   }
 
   function neonLine(a,b,alpha){
-    line(a,b,'#03251a',isMobile?11:13,alpha*.27,isMobile?11:14);
-    line(a,b,'#00ff9d',isMobile?3.8:4.1,alpha,isMobile?9:11);
-    line(a,b,'#c8ffe9',1,alpha,isMobile?3:4);
+    line(a,b,'#00a968',isMobile?8:9,alpha*.38,isMobile?7:8);
+    line(a,b,'#00ff9d',isMobile?3.6:3.9,alpha,isMobile?5:6);
+    line(a,b,'#c8ffe9',.9,alpha,0);
   }
 
   function drawAtmosphere(dt,now){
@@ -1903,16 +1912,6 @@ document.head.appendChild(_ds);
     }
     ctx.restore();
 
-    ctx.save();
-    ctx.font='11px Share Tech Mono,monospace';
-    ctx.textAlign='center';
-    for(const bit of backgroundBits){
-      bit.y+=bit.speed*dt;
-      if(bit.y>height+20)bit.y=-20;
-      ctx.fillStyle=`rgba(0,255,157,${bit.alpha})`;
-      ctx.fillText(bit.char,bit.x,bit.y);
-    }
-    ctx.restore();
   }
 
   function drawLogo(){
@@ -1920,8 +1919,8 @@ document.head.appendChild(_ds);
     const back=points.map(p=>project(p,-.09));
     const innerFront=inner.map(s=>s.map(p=>project(p,.09)));
     const innerBack=inner.map(s=>s.map(p=>project(p,-.09)));
-    for(let i=0;i<points.length;i++)line(back[i],front[i],'#123c30',1.8,.38,8);
-    for(const [a,b] of outline)line(back[a],back[b],'#071711',2,.64,8);
+    for(let i=0;i<points.length;i++)line(back[i],front[i],'#123c30',1.8,.38,0);
+    for(const [a,b] of outline)line(back[a],back[b],'#071711',2,.64,0);
     const sorted=outline.slice().sort((a,b)=>
       (front[a[0]].z+front[a[1]].z)-(front[b[0]].z+front[b[1]].z)
     );
@@ -1930,9 +1929,9 @@ document.head.appendChild(_ds);
       neonLine(front[a],front[b],visibility);
     }
     for(let i=0;i<inner.length;i++){
-      line(innerBack[i][0],innerBack[i][1],'#071711',2,.64,8);
-      line(innerBack[i][0],innerFront[i][0],'#123c30',1.5,.4,8);
-      line(innerBack[i][1],innerFront[i][1],'#123c30',1.5,.4,8);
+      line(innerBack[i][0],innerBack[i][1],'#071711',2,.64,0);
+      line(innerBack[i][0],innerFront[i][0],'#123c30',1.5,.4,0);
+      line(innerBack[i][1],innerFront[i][1],'#123c30',1.5,.4,0);
       neonLine(innerFront[i][0],innerFront[i][1],.96);
     }
   }
@@ -2003,7 +2002,15 @@ document.head.appendChild(_ds);
 
   function frame(now){
     const elapsed=now-last;
-    if(elapsed<15){
+    if(elapsed<30){
+      requestAnimationFrame(frame);
+      return;
+    }
+    const covered=document.hidden ||
+      document.querySelector('.window.maximized:not(.minimized)') ||
+      (isMobile && document.querySelector('.window.open:not(.minimized)'));
+    if(covered){
+      last=now;
       requestAnimationFrame(frame);
       return;
     }
