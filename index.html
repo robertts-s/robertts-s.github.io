@@ -1819,9 +1819,11 @@ document.head.appendChild(_ds);
 
   function resizeWallpaper(){
     isMobile = innerWidth <= 600;
-    dpr = Math.min(devicePixelRatio || 1,isMobile?1.5:1.35);
     width = Math.round(window.visualViewport?.width || innerWidth);
     height = Math.round(window.visualViewport?.height || innerHeight);
+    const maxPixels=isMobile?1800000:2500000;
+    const adaptiveDpr=Math.sqrt(maxPixels/Math.max(1,width*height));
+    dpr = Math.min(devicePixelRatio || 1,isMobile?1.5:1.35,adaptiveDpr);
     canvas.width = Math.round(width*dpr);
     canvas.height = Math.round(height*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -1882,16 +1884,9 @@ document.head.appendChild(_ds);
   }
 
   function neonLine(a,b,alpha){
-    if(isMobile){
-      line(a,b,'#03251a',11,alpha*.25,12);
-      line(a,b,'#00ff9d',3.8,alpha,10);
-      line(a,b,'#c8ffe9',1,alpha,3);
-      return;
-    }
-    line(a,b,'#03251a',13,alpha*.27,17);
-    line(a,b,'#00a968',7,alpha*.40,16);
-    line(a,b,'#00ff9d',3.7,alpha,14);
-    line(a,b,'#c8ffe9',1,alpha,5);
+    line(a,b,'#03251a',isMobile?11:13,alpha*.27,isMobile?11:14);
+    line(a,b,'#00ff9d',isMobile?3.8:4.1,alpha,isMobile?9:11);
+    line(a,b,'#c8ffe9',1,alpha,isMobile?3:4);
   }
 
   function drawAtmosphere(dt,now){
@@ -2007,7 +2002,12 @@ document.head.appendChild(_ds);
   }
 
   function frame(now){
-    const dt=Math.min((now-last)/1000,.04);
+    const elapsed=now-last;
+    if(elapsed<15){
+      requestAnimationFrame(frame);
+      return;
+    }
+    const dt=Math.min(elapsed/1000,.04);
     last=now;
     if(!reducedMotion)rotation+=dt*.35;
     ctx.clearRect(0,0,width,height);
