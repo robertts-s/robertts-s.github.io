@@ -1531,12 +1531,22 @@ consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo en espera. Abre 
     </div>
     <div class="tetris-help">ARROWS / WASD · Z/X ROTATE · SPACE DROP · P PAUSE · R RESTART</div>
     <div class="tetris-mobile" id="tetrisMobileControls">
-      <button class="sn-btn" onclick="tetrisMove(-1,0)">&#9664;</button>
-      <button class="sn-btn" onclick="tetrisRotate(1)">&#8635;</button>
-      <button class="sn-btn" onclick="tetrisSoftDrop()">&#9660;</button>
-      <button class="sn-btn" onclick="tetrisMove(1,0)">&#9654;</button>
-      <button class="sn-btn tet-drop-btn" onclick="tetrisHardDrop()">DROP</button>
-      <button class="sn-btn" onclick="tetrisTogglePause()">&#9646;&#9646;</button>
+      <div class="tet-control-group">
+        <span class="tet-control-label">MOVE</span>
+        <div class="tet-dpad">
+          <button class="tet-touch tet-left" aria-label="Mover a la izquierda" onpointerdown="tetrisTouchHold(event,'left')">&#9664;</button>
+          <button class="tet-touch tet-down" aria-label="Bajar pieza" onpointerdown="tetrisTouchHold(event,'down')">&#9660;</button>
+          <button class="tet-touch tet-right" aria-label="Mover a la derecha" onpointerdown="tetrisTouchHold(event,'right')">&#9654;</button>
+        </div>
+      </div>
+      <div class="tet-control-group tet-action-group">
+        <span class="tet-control-label">ACTION</span>
+        <div class="tet-action-pad">
+          <button class="tet-touch tet-rotate" aria-label="Girar pieza" onpointerdown="event.preventDefault();tetrisRotate(1)"><span>&#8635;</span><small>ROTATE</small></button>
+          <button class="tet-touch tet-hard-drop" aria-label="Caída instantánea" onpointerdown="event.preventDefault();tetrisHardDrop()"><span>&#9660;&#9660;</span><small>DROP</small></button>
+          <button class="tet-touch tet-pause" aria-label="Pausar partida" onpointerdown="event.preventDefault();tetrisTogglePause()"><span>&#9646;&#9646;</span><small>PAUSE</small></button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-tetris','n')"></div>
@@ -1573,12 +1583,23 @@ consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo en espera. Abre 
 .tetris-actions button:first-child:hover{background:var(--tet-acc2);box-shadow:0 0 18px rgba(255,107,0,.35)}
 .tetris-actions button:last-child:hover{border-color:var(--tet-acc);color:var(--tet-acc)}
 .tetris-help{font-size:.5rem;color:var(--tet-muted);letter-spacing:1px;text-align:center}
-.tetris-mobile{display:none;gap:5px;align-items:center;justify-content:center}
-.tetris-mobile .sn-btn{background:var(--tet-s2);border-color:var(--tet-border);color:var(--tet-acc)}
-.tetris-mobile .sn-btn:hover{background:rgba(255,107,0,.07);border-color:var(--tet-acc)}
+.tetris-mobile{display:none}
+.tet-control-group{display:flex;flex-direction:column;gap:5px}
+.tet-control-label{font-size:.42rem;letter-spacing:2px;color:var(--tet-muted);text-align:center}
+.tet-dpad{display:grid;grid-template-columns:repeat(3,56px);gap:5px;align-items:end}
+.tet-action-pad{display:grid;grid-template-columns:repeat(2,64px);grid-template-rows:56px 44px;gap:5px}
+.tet-touch{background:var(--tet-s2);border:1px solid var(--tet-border);color:var(--tet-acc);font-family:var(--font);font-size:1rem;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.tet-touch:active{transform:scale(.94);border-color:var(--tet-acc);background:rgba(255,107,0,.12);box-shadow:0 0 12px rgba(255,107,0,.18)}
+.tet-dpad .tet-touch{width:56px;height:56px}
+.tet-down{grid-column:2}
+.tet-right{grid-column:3}
+.tet-action-pad .tet-touch{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tet-action-pad small{font-size:.38rem;letter-spacing:1px;color:var(--tet-muted)}
+.tet-hard-drop{background:var(--tet-acc);border-color:var(--tet-acc);color:#000;font-weight:700}
+.tet-hard-drop small{color:#241006}
+.tet-pause{grid-column:1/3}
 #win-tetris.focused{border-color:rgba(255,107,0,.45);box-shadow:0 0 0 1px rgba(255,107,0,.08),0 0 30px rgba(255,107,0,.07),0 20px 60px rgba(0,0,0,.7)}
 #win-tetris.focused .win-title{color:#ff6b00}
-.tet-drop-btn{width:52px;font-size:.52rem}
 @media(max-width:600px){
   #snakeCanvas{width:min(86vw,520px);height:min(86vw,520px)}
   .tetris-body{padding:8px;gap:6px;justify-content:center}
@@ -1590,7 +1611,13 @@ consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo en espera. Abre 
   .tetris-next-row{display:none}
   .tetris-actions{display:none}
   .tetris-help{display:none}
-  .tetris-mobile{display:flex}
+  .tetris-mobile{width:100%;display:grid;grid-template-columns:auto auto;justify-content:center;align-items:end;gap:12px;padding:8px;background:var(--tet-s1);border:1px solid var(--tet-border)}
+}
+@media(max-width:370px){
+  .tet-dpad{grid-template-columns:repeat(3,50px)}
+  .tet-dpad .tet-touch{width:50px;height:52px}
+  .tet-action-pad{grid-template-columns:repeat(2,56px)}
+  .tetris-mobile{gap:7px;padding:6px}
 }
 </style>
 
@@ -1902,6 +1929,26 @@ let tetrisBoard=[],tetrisPiece=null,tetrisNextPiece=null,tetrisBag=[];
 let tetrisTimer=null,tetrisRunning=false,tetrisPaused=false,tetrisOver=false;
 let tetrisScore=0,tetrisLines=0,tetrisLevel=1;
 let tetrisBestScore=Number(localStorage.getItem('robertts_tetris_best')||0);
+let tetrisTouchDelay=null,tetrisTouchRepeat=null;
+
+function tetrisTouchHold(event,action){
+  event.preventDefault();
+  const run=()=>{
+    if(action==='left')tetrisMove(-1,0);
+    else if(action==='right')tetrisMove(1,0);
+    else tetrisSoftDrop();
+  };
+  const stop=()=>{
+    clearTimeout(tetrisTouchDelay);clearInterval(tetrisTouchRepeat);
+    tetrisTouchDelay=null;tetrisTouchRepeat=null;
+  };
+  stop();run();
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  event.currentTarget.addEventListener('pointerup',stop,{once:true});
+  event.currentTarget.addEventListener('pointercancel',stop,{once:true});
+  event.currentTarget.addEventListener('lostpointercapture',stop,{once:true});
+  tetrisTouchDelay=setTimeout(()=>{tetrisTouchRepeat=setInterval(run,75);},180);
+}
 
 function tetrisEmptyBoard(){return Array.from({length:TT_ROWS},()=>Array(TT_COLS).fill(0));}
 function tetrisCloneMatrix(matrix){return matrix.map(row=>row.slice());}
