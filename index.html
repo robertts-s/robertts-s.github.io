@@ -362,19 +362,28 @@ body::before{
 .s-arrow{font-size:0.65rem;color:var(--muted)}
 
 /* ── TERMINAL WINDOW ────────────────── */
-#win-terminal{width:480px;top:140px;left:150px}
+#win-terminal{width:560px;height:390px;top:110px;left:150px}
 .term-body{
-  padding:14px;font-size:0.68rem;
+  height:100%;padding:14px;font-size:0.68rem;
   background:#050608;color:var(--accent);
-  line-height:1.9;min-height:200px
+  line-height:1.75;display:flex;flex-direction:column;
+  cursor:text
 }
+.term-output{flex:1;min-height:0;overflow-y:auto;padding-right:4px}
 .t-line{display:flex;gap:6px;flex-wrap:wrap}
 .t-prompt{color:var(--muted2)}
 .t-prompt .host{color:var(--accent)}
 .t-cmd{color:var(--text)}
 .t-out{color:var(--muted2);padding-left:14px}
 .t-out .val{color:var(--accent)}
-.t-cur{display:inline-block;width:7px;height:13px;background:var(--accent);animation:blink 1s step-end infinite;vertical-align:middle}
+.t-out.error{color:var(--red)}
+.t-out.warn{color:var(--yellow)}
+.term-input-row{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:4px}
+.term-input{
+  flex:1;min-width:0;background:transparent;border:0;outline:0;
+  color:var(--text);font:inherit;line-height:1.75;caret-color:var(--accent)
+}
+.term-hint{padding-top:7px;border-top:1px solid var(--border);font-size:.54rem;color:var(--muted);letter-spacing:.5px;flex-shrink:0}
 
 /* ── FLIPPER WINDOW ─────────────────── */
 #win-flipper{width:900px;top:50px;left:80px}
@@ -856,19 +865,13 @@ body::before{
     <div style="width:42px"></div>
   </div>
   <div class="win-body">
-    <div class="term-body">
-      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">whoami</span></div>
-      <div class="t-out">robertts_ <span class="val">// developer &amp; security enthusiast</span></div>
-      <br>
-      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">cat links.txt</span></div>
-      <div class="t-out">instagram  <span class="val">→ @robertts.s</span></div>
-      <div class="t-out">tiktok     <span class="val">→ @robertts.s</span></div>
-      <div class="t-out">github     <span class="val">→ github.com/roberttsOS</span></div>
-      <br>
-      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cmd">ls projects/</span></div>
-      <div class="t-out"><span class="val">flipper_ir_macro_builder/</span>  proyecto_02/</div>
-      <br>
-      <div class="t-line"><span class="t-prompt"><span class="host">robertts_</span>@os:~$</span><span class="t-cur"></span></div>
+    <div class="term-body" id="terminalBody">
+      <div class="term-output" id="terminalOutput" aria-live="polite"></div>
+      <form class="term-input-row" id="terminalForm" autocomplete="off">
+        <span class="t-prompt"><span class="host">robertts_</span>@os:~$</span>
+        <input class="term-input" id="terminalInput" aria-label="Comando del terminal" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </form>
+      <div class="term-hint">Escribe <span style="color:var(--accent)">help</span> para ver los comandos · ↑↓ historial · TAB autocompletar</div>
     </div>
   </div>
   <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-terminal','n')"></div>
@@ -1859,12 +1862,14 @@ function openWin(id){
     if(id==='win-tetris')tetrisResume();
     if(id==='win-pet')startPetGame();
     if(id==='win-before-idie')window.beforeIDieInit?.();
+    if(id==='win-terminal')setTimeout(()=>document.getElementById('terminalInput')?.focus(),0);
     return;
   }
   if(w.classList.contains('open')){
     focus(id);
     if(id==='win-pet')startPetGame();
     if(id==='win-before-idie')window.beforeIDieInit?.();
+    if(id==='win-terminal')setTimeout(()=>document.getElementById('terminalInput')?.focus(),0);
     return;
   }
   w.classList.add('open');
@@ -1882,6 +1887,7 @@ function openWin(id){
   if(id==='win-tetris')tetrisInit();
   if(id==='win-pet')startPetGame();
   if(id==='win-before-idie')window.beforeIDieInit?.();
+  if(id==='win-terminal')setTimeout(()=>document.getElementById('terminalInput')?.focus(),0);
 }
 
 function closeWin(id){
@@ -1987,6 +1993,178 @@ document.addEventListener('click',e=>{
   if(!m.contains(e.target)&&e.target!==b)m.classList.remove('open');
 });
 document.querySelectorAll('.window').forEach(w=>w.addEventListener('mousedown',()=>focus(w.id)));
+
+// ── INTERACTIVE TERMINAL ──────────────
+const terminalOutput=document.getElementById('terminalOutput');
+const terminalInput=document.getElementById('terminalInput');
+const terminalForm=document.getElementById('terminalForm');
+const terminalBody=document.getElementById('terminalBody');
+const terminalHistory=[];
+let terminalHistoryIndex=0;
+
+const terminalApps={
+  about:'win-about',whoami:'win-about',
+  projects:'win-projects',social:'win-social',links:'win-social',
+  snake:'win-snake',tetris:'win-tetris',tetrix:'win-tetris',
+  pet:'win-pet',wishes:'win-before-idie',wish:'win-before-idie',
+  deseos:'win-before-idie'
+};
+const terminalCommandNames=[
+  'help','about','whoami','projects','social','links','snake','tetris','tetrix',
+  'pet','wishes','deseos','flipper','date','time','status','echo','history',
+  'clear','open','ls','pwd','cat','exit'
+];
+
+function terminalScroll(){
+  requestAnimationFrame(()=>{terminalOutput.scrollTop=terminalOutput.scrollHeight;});
+}
+function terminalLine(text,className='t-out'){
+  const line=document.createElement('div');
+  line.className=className;
+  line.textContent=text;
+  terminalOutput.appendChild(line);
+  terminalScroll();
+  return line;
+}
+function terminalRichLine(parts,className='t-out'){
+  const line=document.createElement('div');
+  line.className=className;
+  parts.forEach(part=>{
+    const span=document.createElement('span');
+    span.textContent=part.text;
+    if(part.value)span.className='val';
+    line.appendChild(span);
+  });
+  terminalOutput.appendChild(line);
+  terminalScroll();
+}
+function terminalPrompt(command){
+  const line=document.createElement('div');
+  line.className='t-line';
+  const prompt=document.createElement('span');
+  prompt.className='t-prompt';
+  const host=document.createElement('span');
+  host.className='host';host.textContent='robertts_';
+  prompt.append(host,document.createTextNode('@os:~$'));
+  const cmd=document.createElement('span');
+  cmd.className='t-cmd';cmd.textContent=command;
+  line.append(prompt,cmd);
+  terminalOutput.appendChild(line);
+}
+function terminalOpenApp(name){
+  const id=terminalApps[name];
+  if(!id)return false;
+  openWin(id);
+  terminalLine(`opening ${name}...`);
+  return true;
+}
+function terminalHelp(){
+  terminalRichLine([{text:'SYSTEM COMMANDS',value:true}]);
+  terminalLine('help              muestra esta ayuda');
+  terminalLine('about / whoami    abre el perfil');
+  terminalLine('projects          abre los proyectos');
+  terminalLine('social / links    abre las redes');
+  terminalLine('snake | tetris    abre un juego');
+  terminalLine('pet | wishes      abre mascota o mural');
+  terminalLine('flipper           abre IR Macro Builder');
+  terminalLine('open <app>        abre una aplicación');
+  terminalLine('date | time       fecha u hora local');
+  terminalLine('status            estado de la sesión');
+  terminalLine('echo <texto>      imprime un texto');
+  terminalLine('history           historial de comandos');
+  terminalLine('clear             limpia la terminal');
+  terminalLine('exit              minimiza la terminal');
+}
+function terminalExecute(rawCommand){
+  const command=rawCommand.trim();
+  if(!command)return;
+  terminalPrompt(command);
+  terminalHistory.push(command);
+  terminalHistoryIndex=terminalHistory.length;
+
+  const [rawName,...args]=command.split(/\s+/);
+  const name=rawName.toLowerCase();
+  const rest=args.join(' ');
+
+  if(terminalOpenApp(name))return;
+  switch(name){
+    case 'help':terminalHelp();break;
+    case 'clear':terminalOutput.replaceChildren();break;
+    case 'pwd':terminalLine('/home/robertts');break;
+    case 'ls':
+      terminalRichLine([
+        {text:'projects/  ',value:true},{text:'games/  ',value:true},
+        {text:'links.txt  '},{text:'antes_de_morir.txt',value:true}
+      ]);
+      break;
+    case 'cat':
+      if(rest==='links.txt'){
+        terminalLine('instagram  -> @robertts.s');
+        terminalLine('tiktok     -> @robertts.s');
+        terminalLine('github     -> github.com/roberttsOS');
+      }else terminalLine(`cat: ${rest||'missing file'}: file not found`,'t-out error');
+      break;
+    case 'flipper':
+      terminalLine('opening flipper_ir.app...');
+      window.open('https://roberttsOS.github.io/ir-macro-builder/','_blank','noopener');
+      break;
+    case 'date':
+      terminalLine(new Intl.DateTimeFormat('es',{dateStyle:'full'}).format(new Date()));
+      break;
+    case 'time':
+      terminalLine(new Intl.DateTimeFormat('es',{timeStyle:'medium'}).format(new Date()));
+      break;
+    case 'status':
+      terminalLine(`session: online | windows: ${openWins.size} | viewport: ${innerWidth}x${innerHeight}`);
+      break;
+    case 'echo':terminalLine(rest);break;
+    case 'history':
+      if(!terminalHistory.length)terminalLine('history is empty');
+      else terminalHistory.forEach((entry,index)=>terminalLine(`${index+1}  ${entry}`));
+      break;
+    case 'open':
+      if(!rest)terminalLine('usage: open <app>','t-out warn');
+      else if(!terminalOpenApp(rest.toLowerCase()))terminalLine(`open: app '${rest}' not found`,'t-out error');
+      break;
+    case 'exit':minimizeWin('win-terminal');break;
+    default:
+      terminalLine(`${name}: command not found. Escribe 'help'.`,'t-out error');
+  }
+}
+function terminalBoot(){
+  if(terminalOutput.dataset.ready)return;
+  terminalOutput.dataset.ready='1';
+  terminalRichLine([{text:'robertts_OS interactive shell v1.0',value:true}]);
+  terminalLine("Escribe 'help' para ver los comandos disponibles.");
+  terminalLine('');
+}
+terminalForm?.addEventListener('submit',event=>{
+  event.preventDefault();
+  terminalExecute(terminalInput.value);
+  terminalInput.value='';
+});
+terminalInput?.addEventListener('keydown',event=>{
+  if(event.key==='ArrowUp'){
+    event.preventDefault();
+    if(terminalHistoryIndex>0)terminalHistoryIndex--;
+    terminalInput.value=terminalHistory[terminalHistoryIndex]||'';
+    requestAnimationFrame(()=>terminalInput.setSelectionRange(terminalInput.value.length,terminalInput.value.length));
+  }else if(event.key==='ArrowDown'){
+    event.preventDefault();
+    if(terminalHistoryIndex<terminalHistory.length)terminalHistoryIndex++;
+    terminalInput.value=terminalHistory[terminalHistoryIndex]||'';
+  }else if(event.key==='Tab'){
+    event.preventDefault();
+    const typed=terminalInput.value.trim().toLowerCase();
+    const matches=terminalCommandNames.filter(command=>command.startsWith(typed));
+    if(matches.length===1)terminalInput.value=matches[0]+' ';
+    else if(matches.length>1)terminalLine(matches.join('  '));
+  }else if(event.key==='l'&&event.ctrlKey){
+    event.preventDefault();terminalOutput.replaceChildren();
+  }
+});
+terminalBody?.addEventListener('click',()=>terminalInput?.focus());
+terminalBoot();
 
 // ── SNAKE GAME ────────────────────────
 const SN_COLS=20,SN_ROWS=20,SN_CELL=26;
