@@ -334,6 +334,7 @@ body::before{
 #win-pet{width:480px;top:70px;left:160px}
 #win-snake{width:580px;top:24px;left:200px}
 #win-tetris{width:390px;top:32px;left:260px}
+#win-before-idie{width:680px;height:590px;top:46px;left:190px}
 .flipper-iframe{
   width:100%;height:560px;border:none;
   background:var(--bg);display:block
@@ -546,6 +547,16 @@ body::before{
       </div>
       <span class="lbl">tetris.exe</span>
     </div>
+    <!-- before I die -->
+    <div class="d-icon" onclick="openWin('win-before-idie')">
+      <div class="ic-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/>
+          <path d="M7 4v16M10 9h6M10 13h5"/>
+        </svg>
+      </div>
+      <span class="lbl">before_i_die</span>
+    </div>
   </div>
 </div>
 
@@ -575,6 +586,9 @@ body::before{
   </div>
   <div class="smenu-item" onclick="openWin('win-tetris');closeMenu()">
     <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><rect x="4" y="4" width="5" height="5"/><rect x="9" y="4" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/><rect x="14" y="9" width="5" height="5"/><rect x="9" y="14" width="5" height="5"/></svg>tetris.exe
+  </div>
+  <div class="smenu-item" onclick="openWin('win-before-idie');closeMenu()">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M7 4v16M10 9h6M10 13h5"/></svg>antes_de_morir.txt
   </div>
   <div class="smenu-sep"></div>
   <div class="smenu-hdr">links</div>
@@ -1457,6 +1471,59 @@ consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo en espera. Abre 
 </div>
 
 
+<!-- BEFORE I DIE WINDOW -->
+<div class="window" id="win-before-idie">
+  <div class="titlebar" onmousedown="startDrag(event,'win-before-idie')">
+    <div class="win-dots">
+      <div class="dot close" onclick="closeWin('win-before-idie')"></div>
+      <div class="dot min" onclick="maximizeWin('win-before-idie')"></div>
+      <div class="dot max" onclick="minimizeWin('win-before-idie')"></div>
+    </div>
+    <div class="win-title">antes_de_morir.txt</div>
+    <div style="width:42px"></div>
+  </div>
+  <div class="win-body bid-body">
+    <header class="bid-header">
+      <span class="bid-kicker">// archivo colectivo de deseos</span>
+      <h2>ANTES DE MORIR <span>QUIERO...</span></h2>
+      <p>Deja una meta, un sueño o una pequeña promesa para tu yo del futuro.</p>
+    </header>
+
+    <form class="bid-form" id="bidForm">
+      <label for="bidWish">COMPLETA LA FRASE</label>
+      <div class="bid-sentence">
+        <span>ANTES DE MORIR QUIERO...</span>
+        <textarea id="bidWish" maxlength="180" rows="3" placeholder="viajar por todo el mundo" aria-label="Completa la frase Antes de morir quiero" required disabled></textarea>
+      </div>
+      <div class="bid-form-row">
+        <input id="bidName" maxlength="24" placeholder="firma: nombre o mote (opcional)" aria-label="Firma con nombre o mote" autocomplete="nickname" disabled>
+        <span id="bidCounter">0 / 180</span>
+        <button type="submit" id="bidSubmit" disabled>PUBLICAR</button>
+      </div>
+      <div class="bid-notice">Una publicación por visitante. No escribas información personal.</div>
+    </form>
+
+    <div class="bid-toolbar">
+      <span id="bidStatus">FIREBASE // esperando configuración</span>
+      <span id="bidTotal">0 deseos</span>
+    </div>
+    <div class="bid-list" id="bidList" aria-live="polite">
+      <div class="bid-empty">
+        Configura Firebase para conectar el mural.<br>
+        <span>Edita firebase-config.js y publica firebase-rules.json.</span>
+      </div>
+    </div>
+  </div>
+  <div class="resize-handle rh-n"  onmousedown="startResize(event,'win-before-idie','n')"></div>
+  <div class="resize-handle rh-s"  onmousedown="startResize(event,'win-before-idie','s')"></div>
+  <div class="resize-handle rh-w"  onmousedown="startResize(event,'win-before-idie','w')"></div>
+  <div class="resize-handle rh-e"  onmousedown="startResize(event,'win-before-idie','e')"></div>
+  <div class="resize-handle rh-nw" onmousedown="startResize(event,'win-before-idie','nw')"></div>
+  <div class="resize-handle rh-ne" onmousedown="startResize(event,'win-before-idie','ne')"></div>
+  <div class="resize-handle rh-sw" onmousedown="startResize(event,'win-before-idie','sw')"></div>
+  <div class="resize-handle rh-se" onmousedown="startResize(event,'win-before-idie','se')"></div>
+</div>
+
 <!-- SNAKE WINDOW -->
 <div class="window" id="win-snake">
   <div class="titlebar" onmousedown="startDrag(event,'win-snake')">
@@ -1563,6 +1630,50 @@ consoleLog.innerHTML = `&lt;span&gt;sys://&lt;/span&gt; Núcleo en espera. Abre 
 .sn-btn{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border2);color:var(--accent);font-size:0.75rem;cursor:pointer;transition:all 0.1s;font-family:var(--font)}
 .sn-btn:hover{background:rgba(0,255,157,0.1);border-color:var(--accent)}
 .sn-btn:active{transform:scale(0.92)}
+.bid-body{height:100%;padding:18px;background:#080a0d;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.bid-header{border-bottom:1px solid var(--border2);padding-bottom:14px}
+.bid-kicker{display:block;font-size:.52rem;letter-spacing:3px;color:var(--accent);margin-bottom:5px}
+.bid-header h2{font-family:var(--font-head);font-size:1.25rem;letter-spacing:1px;color:#fff}
+.bid-header h2 span{color:var(--accent);text-shadow:0 0 20px rgba(0,255,157,.25)}
+.bid-header p{font-size:.62rem;line-height:1.6;color:var(--muted2);margin-top:7px}
+.bid-form{padding:12px;background:var(--surface);border:1px solid var(--border2);display:flex;flex-direction:column;gap:7px}
+.bid-form label{font-family:var(--font-head);font-size:.5rem;letter-spacing:2px;color:var(--accent)}
+.bid-sentence{background:#050608;border:1px solid var(--border2)}
+.bid-sentence:focus-within{border-color:rgba(0,255,157,.55);box-shadow:0 0 0 1px rgba(0,255,157,.08)}
+.bid-sentence>span{display:block;padding:9px 12px 0;font-family:var(--font-head);font-size:.58rem;letter-spacing:1.5px;color:var(--accent)}
+.bid-form textarea,.bid-form input{font-family:var(--font);color:var(--text);background:#050608;border:1px solid var(--border2);outline:none;resize:none}
+.bid-form textarea{width:100%;padding:7px 12px 10px;font-size:.72rem;line-height:1.55;border:0}
+.bid-form input{min-width:0;flex:1;padding:8px 10px;font-size:.62rem}
+.bid-form input:focus{border-color:rgba(0,255,157,.55);box-shadow:0 0 0 1px rgba(0,255,157,.08)}
+.bid-form textarea:disabled,.bid-form input:disabled{opacity:.45;cursor:not-allowed}
+.bid-form-row{display:flex;align-items:center;gap:8px}
+#bidCounter{font-size:.52rem;color:var(--muted2);white-space:nowrap}
+#bidSubmit{padding:8px 14px;background:var(--accent);border:1px solid var(--accent);color:#03100a;font:700 .5rem var(--font-head);letter-spacing:1.5px;cursor:pointer}
+#bidSubmit:hover:not(:disabled){background:#61ffc2;box-shadow:0 0 18px rgba(0,255,157,.22)}
+#bidSubmit:disabled{background:var(--surface2);border-color:var(--border2);color:var(--muted);cursor:not-allowed}
+.bid-notice{font-size:.48rem;color:var(--muted);letter-spacing:.5px}
+.bid-toolbar{display:flex;justify-content:space-between;gap:12px;font-size:.5rem;letter-spacing:1px;color:var(--muted2)}
+#bidStatus[data-state="online"]{color:var(--accent)}
+#bidStatus[data-state="error"]{color:var(--red)}
+.bid-list{min-height:120px;flex:1;overflow:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:8px;padding-right:3px}
+.bid-card{position:relative;min-height:108px;padding:13px 13px 11px;background:var(--surface);border:1px solid var(--border2);overflow:hidden}
+.bid-card::before{content:'“';position:absolute;right:8px;top:-12px;font-family:Georgia,serif;font-size:4.5rem;color:rgba(0,255,157,.055);line-height:1}
+.bid-card p{position:relative;font-size:.68rem;line-height:1.65;color:var(--text);overflow-wrap:anywhere}
+.bid-card p::before{content:'ANTES DE MORIR QUIERO ';font-size:.48rem;letter-spacing:1px;color:var(--accent)}
+.bid-meta{position:relative;display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:.48rem;color:var(--muted2)}
+.bid-empty{grid-column:1/-1;border:1px dashed var(--border2);padding:26px;text-align:center;font-size:.62rem;line-height:1.8;color:var(--muted2)}
+.bid-empty span{color:var(--accent);font-size:.54rem}
+.bid-error{color:var(--red)}
+@media(max-width:600px){
+  .bid-body{padding:12px;gap:10px}
+  .bid-header h2{font-size:.95rem}
+  .bid-header p{font-size:.58rem}
+  .bid-form-row{flex-wrap:wrap}
+  .bid-form-row input{flex-basis:100%}
+  #bidSubmit{margin-left:auto}
+  .bid-list{grid-template-columns:1fr}
+  .bid-card{min-height:94px}
+}
 #snakeCanvas{width:520px;height:520px;max-width:calc(100vw - 32px);max-height:calc(100vw - 32px)}
 .tetris-body{--tet-bg:#0a0c0f;--tet-s1:#111318;--tet-s2:#181c23;--tet-border:#1e2530;--tet-acc:#ff6b00;--tet-acc2:#ff9a40;--tet-green:#39ff14;--tet-text:#c8d4e8;--tet-muted:#5a6a80;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px;background-color:var(--tet-bg);background-image:linear-gradient(rgba(255,107,0,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.025) 1px,transparent 1px);background-size:40px 40px}
 .tetris-heading{width:100%;font-family:var(--font-head);font-size:.58rem;letter-spacing:3px;color:var(--tet-acc);padding:9px 10px;border:1px solid var(--tet-border);border-bottom-color:var(--tet-acc);background:var(--tet-s1);display:flex;align-items:center;gap:8px}
@@ -1684,11 +1795,13 @@ function openWin(id){
     if(id==='win-snake')snakeResume();
     if(id==='win-tetris')tetrisResume();
     if(id==='win-pet')startPetGame();
+    if(id==='win-before-idie')window.beforeIDieInit?.();
     return;
   }
   if(w.classList.contains('open')){
     focus(id);
     if(id==='win-pet')startPetGame();
+    if(id==='win-before-idie')window.beforeIDieInit?.();
     return;
   }
   w.classList.add('open');
@@ -1705,6 +1818,7 @@ function openWin(id){
   if(id==='win-snake')snakeInit();
   if(id==='win-tetris')tetrisInit();
   if(id==='win-pet')startPetGame();
+  if(id==='win-before-idie')window.beforeIDieInit?.();
 }
 
 function closeWin(id){
@@ -2178,6 +2292,201 @@ document.addEventListener('keydown',e=>{
 const _ds=document.createElement('style');
 _ds.textContent='.window.maximized{border-radius:0!important}.tb-minimized{opacity:0.55;font-style:italic}';
 document.head.appendChild(_ds);
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInAnonymously
+} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import {
+  getDatabase,
+  limitToLast,
+  onValue,
+  orderByChild,
+  query,
+  ref,
+  serverTimestamp,
+  set
+} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js';
+import { firebaseConfig } from './assets/firebase-config.js';
+
+const bidElements = {
+  form: document.getElementById('bidForm'),
+  wish: document.getElementById('bidWish'),
+  name: document.getElementById('bidName'),
+  submit: document.getElementById('bidSubmit'),
+  counter: document.getElementById('bidCounter'),
+  status: document.getElementById('bidStatus'),
+  total: document.getElementById('bidTotal'),
+  list: document.getElementById('bidList')
+};
+
+let bidStarted = false;
+let bidUser = null;
+let bidOwnWishExists = false;
+let bidSubmitting = false;
+
+function bidIsConfigured(){
+  return firebaseConfig.apiKey &&
+    firebaseConfig.databaseURL &&
+    !Object.values(firebaseConfig).some(value=>String(value).includes('PEGA_AQUI'));
+}
+
+function bidSetStatus(message,state=''){
+  bidElements.status.textContent=message;
+  if(state)bidElements.status.dataset.state=state;
+  else delete bidElements.status.dataset.state;
+}
+
+function bidSetFormEnabled(enabled){
+  const canWrite=enabled&&!bidOwnWishExists&&!bidSubmitting;
+  bidElements.wish.disabled=!canWrite;
+  bidElements.name.disabled=!canWrite;
+  bidElements.submit.disabled=!canWrite;
+}
+
+function bidFormatDate(timestamp){
+  if(!Number.isFinite(timestamp))return 'ahora';
+  return new Intl.DateTimeFormat('es',{
+    day:'2-digit',
+    month:'short',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  }).format(new Date(timestamp));
+}
+
+function bidRender(snapshot){
+  const wishes=[];
+  snapshot.forEach(child=>{
+    const value=child.val();
+    if(value&&typeof value.text==='string')wishes.push({...value,id:child.key});
+  });
+  wishes.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  bidSubmitting=false;
+  bidOwnWishExists=Boolean(bidUser&&wishes.some(wish=>wish.uid===bidUser.uid));
+  bidElements.total.textContent=`${wishes.length} ${wishes.length===1?'deseo':'deseos'}`;
+  bidElements.list.replaceChildren();
+
+  if(!wishes.length){
+    const empty=document.createElement('div');
+    empty.className='bid-empty';
+    empty.textContent='Todavía no hay deseos. Puedes escribir el primero.';
+    bidElements.list.appendChild(empty);
+  }else{
+    wishes.forEach(wish=>{
+      const card=document.createElement('article');
+      card.className='bid-card';
+      const text=document.createElement('p');
+      text.textContent=wish.text;
+      const meta=document.createElement('div');
+      meta.className='bid-meta';
+      const name=document.createElement('span');
+      name.textContent=`— ${wish.name||'Anónimo'}`;
+      const date=document.createElement('time');
+      date.textContent=bidFormatDate(wish.createdAt);
+      meta.append(name,date);
+      card.append(text,meta);
+      bidElements.list.appendChild(card);
+    });
+  }
+
+  if(bidOwnWishExists){
+    bidSetStatus('PUBLICADO // ya dejaste tu deseo','online');
+    bidElements.wish.value='';
+    bidElements.name.value='';
+    bidElements.counter.textContent='0 / 180';
+  }else{
+    bidSetStatus('ONLINE // listo para publicar','online');
+  }
+  bidSetFormEnabled(Boolean(bidUser));
+}
+
+function bidFriendlyError(error){
+  const code=error?.code||'';
+  if(code.includes('auth/operation-not-allowed')){
+    return 'Activa Authentication > Anónimo en Firebase.';
+  }
+  if(code.includes('permission-denied')){
+    return 'Permiso denegado. Publica las reglas de firebase-rules.json.';
+  }
+  return 'No se pudo conectar con Firebase. Revisa la configuración.';
+}
+
+async function bidSubmitWish(event){
+  event.preventDefault();
+  if(!bidUser||bidOwnWishExists||bidSubmitting)return;
+  const text=bidElements.wish.value
+    .trim()
+    .replace(/^antes\s+de\s+morir\s+quiero(?:\s*\.{0,3})?\s*/i,'')
+    .replace(/\s+/g,' ');
+  const name=bidElements.name.value.trim().replace(/\s+/g,' ')||'Anónimo';
+  if(text.length<3||text.length>180||name.length>24){
+    bidSetStatus('ERROR // revisa la longitud del texto','error');
+    return;
+  }
+
+  bidSubmitting=true;
+  bidSetFormEnabled(true);
+  bidSetStatus('SYNC // publicando...');
+  try{
+    const db=getDatabase();
+    await set(ref(db,`wishes/${bidUser.uid}`),{
+      text,
+      name,
+      uid:bidUser.uid,
+      createdAt:serverTimestamp()
+    });
+  }catch(error){
+    bidSubmitting=false;
+    bidSetStatus(`ERROR // ${bidFriendlyError(error)}`,'error');
+    bidSetFormEnabled(true);
+  }
+}
+
+async function bidInit(){
+  if(bidStarted)return;
+  bidStarted=true;
+  if(!bidIsConfigured()){
+    bidSetStatus('SETUP // completa firebase-config.js','error');
+    return;
+  }
+
+  try{
+    const app=initializeApp(firebaseConfig);
+    const auth=getAuth(app);
+    const db=getDatabase(app);
+    bidSetStatus('AUTH // creando sesión anónima');
+
+    onAuthStateChanged(auth,async user=>{
+      if(!user){
+        try{await signInAnonymously(auth);}
+        catch(error){
+          bidSetStatus(`ERROR // ${bidFriendlyError(error)}`,'error');
+        }
+        return;
+      }
+      bidUser=user;
+      bidSetFormEnabled(true);
+      const wishesQuery=query(ref(db,'wishes'),orderByChild('createdAt'),limitToLast(100));
+      onValue(wishesQuery,bidRender,error=>{
+        bidSetStatus(`ERROR // ${bidFriendlyError(error)}`,'error');
+      });
+    });
+  }catch(error){
+    bidSetStatus(`ERROR // ${bidFriendlyError(error)}`,'error');
+  }
+}
+
+bidElements.wish.addEventListener('input',()=>{
+  bidElements.counter.textContent=`${bidElements.wish.value.length} / 180`;
+});
+bidElements.form.addEventListener('submit',bidSubmitWish);
+window.beforeIDieInit=bidInit;
+
+if(document.getElementById('win-before-idie')?.classList.contains('open'))bidInit();
 </script>
 <script>
 (() => {
