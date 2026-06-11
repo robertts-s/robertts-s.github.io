@@ -124,6 +124,43 @@ body::before{
 }
 .d-icon:hover .lbl{color:var(--accent)}
 
+/* ── INTERNET MUSEUM ACCESS ────────── */
+.museum-access{
+  position:absolute;top:18px;right:18px;z-index:14;
+  display:flex;align-items:center;gap:11px;
+  padding:9px 12px 9px 10px;
+  color:var(--text);background:rgba(9,12,15,.9);
+  border:1px solid rgba(0,255,157,.32);
+  box-shadow:0 12px 36px rgba(0,0,0,.42),0 0 18px rgba(0,255,157,.05);
+  text-decoration:none;outline:none;
+  transition:transform .16s,border-color .16s,box-shadow .16s,background .16s
+}
+.museum-access::before{
+  content:'';position:absolute;left:-1px;top:-1px;
+  width:10px;height:10px;
+  border-left:2px solid var(--accent);border-top:2px solid var(--accent)
+}
+.museum-access-icon{
+  width:30px;height:30px;display:grid;place-items:center;
+  border:1px solid var(--border2);color:var(--accent);
+  background:rgba(0,255,157,.07);font-size:.82rem
+}
+.museum-access-copy{display:flex;flex-direction:column;gap:1px}
+.museum-access-copy small{
+  color:var(--accent);font-size:.42rem;letter-spacing:1.5px
+}
+.museum-access-copy strong{
+  font-family:var(--font-head);font-size:.58rem;letter-spacing:1px
+}
+.museum-access-arrow{color:var(--muted2);font-size:.68rem}
+.museum-access:hover,.museum-access:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(0,255,157,.72);
+  background:rgba(0,255,157,.06);
+  box-shadow:0 16px 42px rgba(0,0,0,.5),0 0 24px rgba(0,255,157,.12)
+}
+.museum-access:hover .museum-access-arrow{color:var(--accent)}
+
 /* ── FEATURED BROADCAST ─────────────── */
 .bid-feature{
   position:absolute;right:18px;bottom:54px;z-index:12;
@@ -420,6 +457,15 @@ body::before{
   .d-icon .ic-box svg{ width:17px;height:17px }
   .d-icon .lbl{ font-size:0.5rem }
 
+  .museum-access{
+    top:10px;right:10px;gap:7px;
+    padding:7px 8px
+  }
+  .museum-access-icon{width:26px;height:26px}
+  .museum-access-copy small{display:none}
+  .museum-access-copy strong{font-size:.48rem;letter-spacing:.5px}
+  .museum-access-arrow{display:none}
+
   .bid-feature{
     position:absolute;left:10px;right:10px;bottom:58px;width:auto;
     max-width:360px
@@ -523,6 +569,15 @@ body::before{
 
 <!-- DESKTOP -->
 <div id="desktop">
+  <a class="museum-access" href="https://roberttsOS.github.io/internet-museum/" aria-label="Entrar en Internet Museum">
+    <span class="museum-access-icon" aria-hidden="true">⌁</span>
+    <span class="museum-access-copy">
+      <small>NEW_ARCHIVE</small>
+      <strong>INTERNET MUSEUM</strong>
+    </span>
+    <span class="museum-access-arrow" aria-hidden="true">↗</span>
+  </a>
+
   <div class="d-icons">
     <!-- whoami -->
     <div class="d-icon" onclick="openWin('win-about')">
@@ -2168,7 +2223,7 @@ terminalBoot();
 
 // ── SNAKE GAME ────────────────────────
 const SN_COLS=20,SN_ROWS=20,SN_CELL=26;
-let snakeParts=[],snakeDx=1,snakeDy=0,snakeNextDx=1,snakeNextDy=0,snakeFood={},snakeRunning=false,snakePaused=false,snakeInterval=null,snakeScore=0,snakeBestScore=0,snakeDead=false,snakeTurnQueued=false;
+let snakeParts=[],snakeDx=1,snakeDy=0,snakeTurns=[],snakeFood={},snakeRunning=false,snakePaused=false,snakeInterval=null,snakeScore=0,snakeBestScore=0,snakeDead=false;
 
 function snakeInit(){
   const mob=window.innerWidth<=600;
@@ -2176,7 +2231,7 @@ function snakeInit(){
   if(mc)mc.style.display=mob?'flex':'none';
   snakeStop();
   snakeParts=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
-  snakeDx=1;snakeDy=0;snakeNextDx=1;snakeNextDy=0;snakeTurnQueued=false;
+  snakeDx=1;snakeDy=0;snakeTurns=[];
   snakeRunning=false;snakePaused=false;snakeScore=0;snakeDead=false;
   const sc=document.getElementById('snakeScore');if(sc)sc.textContent='0';
   snakePlaceFood();snakeDraw('PRESS SPACE');
@@ -2194,7 +2249,8 @@ function snakePlaceFood(){
   snakeFood=p;
 }
 function snakeStep(){
-  snakeDx=snakeNextDx;snakeDy=snakeNextDy;snakeTurnQueued=false;
+  const nextTurn=snakeTurns.shift();
+  if(nextTurn){snakeDx=nextTurn.dx;snakeDy=nextTurn.dy;}
   const h={x:snakeParts[0].x+snakeDx,y:snakeParts[0].y+snakeDy};
   if(h.x<0||h.x>=SN_COLS||h.y<0||h.y>=SN_ROWS||snakeParts.some(p=>p.x===h.x&&p.y===h.y)){snakeGameOver();return;}
   snakeParts.unshift(h);
@@ -2230,10 +2286,11 @@ function snakeDir(dx,dy){
   if(snakeDead)return;
   if(!snakeRunning)snakeStart();
   if(snakePaused)snakeResume();
-  if(snakeTurnQueued)return;
-  if(dx===-snakeDx&&dy===-snakeDy)return;
-  if(dx===snakeDx&&dy===snakeDy)return;
-  snakeNextDx=dx;snakeNextDy=dy;snakeTurnQueued=true;
+  if(snakeTurns.length>=2)return;
+  const previous=snakeTurns[snakeTurns.length-1]||{dx:snakeDx,dy:snakeDy};
+  if(dx===-previous.dx&&dy===-previous.dy)return;
+  if(dx===previous.dx&&dy===previous.dy)return;
+  snakeTurns.push({dx,dy});
 }
 function snakeDraw(msg){
   const cv=document.getElementById('snakeCanvas');if(!cv)return;
