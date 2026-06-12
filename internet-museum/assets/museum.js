@@ -472,7 +472,7 @@ function interactionMarkup(type) {
     disc: "Sony Computer Entertainment<br><br>Reading disc...",
     source: "&lt;TITLE&gt;World Wide Web&lt;/TITLE&gt;<br>&lt;A HREF='WhatIs.html'&gt;What's out there?&lt;/A&gt;",
     archive: "Snapshot available: 1996<br>Images: 12 · Tables: 8 · Scripts: 0",
-    search: '<div class="archive-search"><input id="archiveQuery" aria-label="Buscar comando secreto" placeholder="buscar en el archivo"><button class="micro-button" id="archiveSubmit" type="button">GO</button></div><div class="archive-result" id="archiveResult"></div>'
+    search: '<div class="archive-search"><input id="archiveQuery" type="text" value="" aria-label="Buscar comando secreto" placeholder="buscar en el archivo" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="micro-button" id="archiveSubmit" type="button">GO</button></div><div class="archive-result" id="archiveResult"></div>'
   };
   return markup[type] || "El archivo responde a tu curiosidad.";
 }
@@ -507,9 +507,18 @@ function bindArtifactInteraction(artifact) {
     playHistoricalSound(event.currentTarget.dataset.sound);
   });
   document.querySelector("#archiveSubmit")?.addEventListener("click", runArchiveSearch);
-  document.querySelector("#archiveQuery")?.addEventListener("keydown", event => {
-    if (event.key === "Enter") runArchiveSearch();
-  });
+  const archiveQuery = document.querySelector("#archiveQuery");
+  if (archiveQuery) {
+    archiveQuery.value = "";
+    archiveQuery.addEventListener("keydown", event => {
+      event.stopPropagation();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        runArchiveSearch();
+      }
+    });
+    archiveQuery.addEventListener("keyup", event => event.stopPropagation());
+  }
 }
 
 function runInteraction(artifact) {
@@ -595,6 +604,10 @@ function runArchiveSearch() {
   const result = document.querySelector("#archiveResult");
   if (!input || !result) return;
   const query = input.value.trim().toLowerCase();
+  input.value = "";
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.focus();
+
   if (query === "robots.txt" || query === "/robots.txt") {
     result.textContent = "User-agent: curious_human · Allow: /secret-room";
     findSecret("robots-file", "Has leído donde normalmente solo miran las máquinas.");
@@ -844,12 +857,19 @@ elements.vaultButton.addEventListener("click", () => {
 elements.dialog.addEventListener("close", () => {
   clearInterval(snakeTimer);
   elements.dialog.classList.remove("nudge");
+  const archiveQuery = document.querySelector("#archiveQuery");
+  const archiveResult = document.querySelector("#archiveResult");
+  if (archiveQuery) archiveQuery.value = "";
+  if (archiveResult) archiveResult.textContent = "";
 });
 elements.finalDialog.addEventListener("click", event => {
   if (event.target === elements.finalDialog) elements.finalDialog.close();
 });
 
 document.addEventListener("keydown", event => {
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target.isContentEditable) {
+    return;
+  }
   const expected = konamiCode[konamiPosition];
   if (event.key === expected) {
     konamiPosition += 1;
